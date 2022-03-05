@@ -1,0 +1,92 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - user is defined
+      - neovim.config.dir is defined
+      - neovim.vim_plug.dir is defined
+      - neovim.vim_plug.url is defined
+      - neovim.vim_plug.dest is defined
+      - neovim.plugins is defined
+    quiet: true
+
+- name: install | apt install
+  apt:
+    update_cache: true
+    state: latest
+    pkg:
+      - python3-pip 
+      - neovim 
+
+- name: install | deploy configuration
+  become_user: "{{ user }}"
+  block: 
+    - name: install | create necessary directories
+      file:
+        path: "{{ item }}" 
+        state: directory
+      loop:
+        - "{{ neovim.config.dir }}"
+        - "{{ neovim.vim_plug.dir }}"
+
+    - name: install | pip install flake8
+      pip:
+        name: flake8
+        state: latest
+        extra_args: --user
+      when:
+        - neovim.vim_plug.enable
+        - neovim.plugins.ale.enable
+
+    - name: install | deploy vim-plug 
+      uri:
+        url: "{{ 'https://' + neovim.vim_plug.url }}"
+        dest: "{{ neovim.vim_plug.dest }}"
+        creates: "{{ neovim.vim_plug.dest }}"
+        return_content: true
+        validate_certs: true
+      when:
+        - neovim.vim_plug.enable
+        
+    - name: install | deploy plug-ins
+      git:
+        repo: "{{ 'https://' + item.value.repo }}"
+        dest: "{{ item.value.dest }}"
+        force: true
+        depth: 1
+        single_branch: true
+      when:
+        - item.value.enable
+        - neovim.vim_plug.enable
+        - neovim.vim_plug.preinstall_plugins
+      loop: "{{ neovim.plugins | dict2items }}"
+
+    - name: install | render vim config from template
+      template:
+        src: init.vim.j2
+        dest: "{{ neovim.config.dir + '/init.vim' }}"
+
+- name: install | apt purge vim
+  apt:
+    pkg:
+      - vim 
+      - vim-athena
+      - vim-common
+      - vim-doc
+      - vim-gtk
+      - vim-gtk3
+      - vim-gui-common
+      - vim-nox
+      - vim-tiny
+    state: absent
+    purge: true
+    autoremove: true
+
+- name: install | remove
+  file:
+    path: "{{ item }}" 
+    state: absent
+  loop:
+    - /usr/bin/vim
+    - /usr/share/vim

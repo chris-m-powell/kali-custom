@@ -1,0 +1,7 @@
+---
+alacritty:
+  project:
+    repo: "github.com/alacritty/alacritty.git"
+    dest: "/tmp/alacritty"
+  config:
+    dir: "~/.config/alacritty"

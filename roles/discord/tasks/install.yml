@@ -1,0 +1,48 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - discord.pkg is defined 
+    quiet: true
+
+- name: install | check install status
+  stat:
+    path: /usr/local/bin/Discord 
+  register: bin
+
+- name: install | download and install
+  block:
+    - name: install | download tarball
+      get_url:
+        url: "{{ 'https://' + discord.pkg }}"
+        dest: /tmp
+      register: tarball
+
+    - name: install | extract tarball
+      unarchive:
+        src: "{{ tarball.dest }}"
+        dest: /opt
+
+    - name: install | remove tarball
+      file:
+        path: "{{ tarball.dest }}"
+        state: absent
+
+    - name: install | link binary
+      file:
+        src: /opt/Discord/Discord
+        dest: /usr/local/bin/Discord
+        state: link
+
+    - name: install | install desktop entry 
+      command: "{{'desktop-file-install ' +  '/opt/Discord/discord.desktop' }}"
+
+    - name: install | set executable path in desktop entry
+      ini_file:
+        path: /usr/share/applications/discord.desktop
+        section: Desktop Entry
+        option: Exec
+        value: /usr/local/bin/Discord
+  when:
+    - not bin.stat.exists

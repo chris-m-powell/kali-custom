@@ -1,0 +1,6 @@
+---
+- name: install | install or update common utilities
+  apt:
+    update_cache: true
+    pkg: "{{ misc_utils.pkg_list }}"
+    state: latest

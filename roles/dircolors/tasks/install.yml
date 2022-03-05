@@ -1,0 +1,40 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - user is defined
+      - dircolors.theme.nord.repo is defined
+      - dircolors.theme.nord.dest is defined
+    quiet: true
+    
+- name: install | clone project
+  become_user: "{{ user }}"
+  git:
+    repo: "{{ 'https://' + dircolors.theme.nord.repo }}"
+    dest: "{{ dircolors.theme.nord.dest }}"
+    force: true
+    depth: 1
+    single_branch: true
+  changed_when: false
+
+- name: install | copy source file to ~/.dir_colors
+  become_user: "{{ user }}"
+  copy:
+    src: "{{ dircolors.theme.nord.dest + '/src/dir_colors' }}"
+    dest: ~/.dir_colors
+    remote_src: true
+
+- name: install | remove install artifacts
+  file:
+    path: "{{ dircolors.theme.nord.dest }}" 
+    state: absent
+  changed_when: false
+
+- name: install | activate 
+  become_user: "{{ user }}"
+  lineinfile:
+    path: ~/.zshrc 
+    state: present
+    line: test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors) 
+    insertafter: EOF

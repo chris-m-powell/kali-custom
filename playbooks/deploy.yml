@@ -1,0 +1,43 @@
+---
+- name: Ensure host is Kali Linux 
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Group by distribution
+      group_by:
+        key: "{{ ansible_distribution }}"
+      changed_when: false
+  tags:
+    - always
+
+- name: Deploy custom configuration 
+  hosts: Kali
+  become: true
+  gather_facts: false
+  handlers:
+    - import_tasks: "{{ playbook_dir + '/includes/handlers.yml' }}"
+      tags:
+        - always
+  pre_tasks:
+    - block:
+        - import_tasks: "{{ playbook_dir + '/includes/package_facts.yml' }}"
+        - import_tasks: "{{ playbook_dir + '/includes/service_facts.yml' }}"
+      tags:
+        - always
+  roles:
+    - alacritty
+    - compton
+    - dircolors
+    - discord
+    - gotop
+    - misc-utils
+    - neofetch
+    - neovim
+    - qutebrowser
+    - ranger
+    - tty-clock
+  post_tasks:
+    - import_tasks: "{{ playbook_dir + '/includes/dist_upgrade.yml' }}"
+      tags:
+        - always

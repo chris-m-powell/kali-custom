@@ -1,0 +1,42 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - gotop.repo is defined 
+      - gotop.dest is defined 
+    quiet: true
+
+- name: install | check if installed
+  stat:
+    path: /usr/local/bin/gotop
+  register: gotop_bin
+
+- name: install | build project from source
+  block:
+    - name: install | clone project 
+      git:
+        repo: "{{ 'https://' + gotop.repo }}"
+        dest: "{{ gotop.dest }}" 
+        depth: 1
+        single_branch: true
+      register: clone
+
+    - name: install | build from source 
+      command: ./scripts/download.sh
+      args:
+        chdir: "{{ gotop.dest }}"
+
+    - name: install | relocate binary
+      copy:
+        src: "{{ gotop.dest + '/gotop' }}" 
+        dest: /usr/local/bin
+        remote_src: true
+        mode: +x
+
+    - name: install | remove project
+      file:
+        path: "{{ gotop.dest }}" 
+        state: absent
+  when:
+    - not gotop_bin.stat.exists

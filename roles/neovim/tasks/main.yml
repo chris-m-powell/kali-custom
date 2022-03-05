@@ -1,0 +1,7 @@
+---
+- block:
+    - import_tasks: "install.yml"
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - neovim

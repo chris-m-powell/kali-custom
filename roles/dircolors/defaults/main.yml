@@ -1,0 +1,6 @@
+---
+dircolors:
+  theme:
+    nord:
+      repo: "github.com/arcticicestudio/nord-dircolors.git"
+      dest: "/tmp/nord-dircolors"

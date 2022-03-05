@@ -1,0 +1,4 @@
+---
+neofetch:
+  config:
+    dir: "~/.config/neofetch"

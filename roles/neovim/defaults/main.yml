@@ -1,0 +1,42 @@
+---
+neovim:
+  vim_plug:
+    dir: "~/.local/share/nvim/site/autoload"
+    url: "raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+    dest: "~/.local/share/nvim/site/autoload/plug.vim"
+    enable: true
+    preinstall_plugins: true
+  plugins:
+    ale:
+      repo: "github.com/dense-analysis/ale.git"
+      dest: "~/.local/share/nvim/plugged/ale"
+      enable: true
+    lightline:
+      repo: "github.com/itchyny/lightline.vim.git"
+      dest: "~/.local/share/nvim/plugged/lightline.vim"
+      enable: true
+    lightline_ale:
+      repo: "github.com/maximbaz/lightline-ale.git"
+      dest: "~/.local/share/nvim/plugged/lightline-ale"
+      enable: true
+    nord_vim:
+      repo: "github.com/arcticicestudio/nord-vim.git"
+      dest: "~/.local/share/nvim/plugged/nord-vim"
+      enable: true
+    vim_commentary:
+      repo: "github.com/tpope/vim-commentary.git"
+      dest: "~/.local/share/nvim/plugged/vim-commentary"
+      enable: true
+    unite:
+      repo: "github.com/Shougo/unite.vim.git"
+      dest: "~/.local/share/nvim/plugged/unite.vim"
+      enable: true
+    vimfiler:
+      repo: "github.com/Shougo/vimfiler.vim.git"
+      dest: "~/.local/share/nvim/plugged/vimfiler.vim"
+      enable: true
+  config:
+    dir: "~/.config/nvim"
+    tabstop: 2
+    softtabstop: 2
+    shiftwidth: 2

@@ -1,0 +1,392 @@
+let mapleader = " "
+
+
+{% if neovim.vim_plug.enable %}
+" -------------------------------------------------
+" Install vim-plug 
+" -------------------------------------------------
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.local/share/nvim/plugged')
+
+{% if neovim.plugins.ale.enable %}
+" -------------------------------------------------
+" Asynchronous LINT Engine 
+" -------------------------------------------------
+" Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
+{% endif %}
+
+{% if neovim.plugins.ale.enable %}
+" -------------------------------------------------
+" Lightline 
+" -------------------------------------------------
+Plug 'itchyny/lightline.vim'
+    let g:lightline = {
+        \ 'colorscheme': 'nord',
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ],
+        \             [ 'readonly', 'filename', 'modified'] ],
+        \   'right': [ [ 'lineinfo' ],
+        \              [ 'percent' ],
+        \              [ 'fileencoding', 'filetype', 'charvalue' ], 
+        \              ['linter_checking','linter_errors', 'linter_warnings', 'linter_ok']]
+        \	},
+        \ }
+    let g:lightline.component_expand = {
+        \  'linter_checking': 'lightline#ale#checking',
+        \  'linter_warnings': 'lightline#ale#warnings',
+        \  'linter_errors': 'lightline#ale#errors',
+        \  'linter_ok': 'lightline#ale#ok',
+        \ }
+    let g:lightline.component_type = {
+        \     'linter_checking': 'left',
+        \     'linter_warnings': 'warning',
+        \     'linter_errors': 'error',
+        \     'linter_ok': 'left',
+        \ }
+    " let g:lightline.tabline = {
+        " \   'left': [ ['tabs'] ],
+        " \   'right': [ ['close'] ]
+        " \ }
+    " set showtabline=2  " Show tabline
+    " set guioptions-=e  " Don't use GUI tabline
+{% endif %}
+
+{% if neovim.plugins.lightline_ale.enable %}
+" -------------------------------------------------
+" Lightline-ALE integration 
+" -------------------------------------------------
+Plug 'maximbaz/lightline-ale'
+{% endif %}
+
+
+{% if neovim.plugins.nord_vim.enable %}
+" -------------------------------------------------
+" Nord theme 
+" -------------------------------------------------
+Plug 'arcticicestudio/nord-vim'
+{% endif %}
+
+
+{% if neovim.plugins.vim_commentary.enable %}
+" -------------------------------------------------
+" Comment/uncommenting 
+" -------------------------------------------------
+Plug 'tpope/vim-commentary'
+    nmap <leader>c <Plug>CommentaryLine
+    vmap <leader>c <Plug>Commentary
+{% endif %}
+
+
+{% if neovim.plugins.unite.enable and neovim.plugins.unite.enable %}
+" -------------------------------------------------
+" File explorer 
+" -------------------------------------------------
+Plug 'Shougo/unite.vim' | Plug 'Shougo/vimfiler.vim'
+    let g:vimfiler_as_default_explorer = 1
+    let g:vimfiler_safe_mode_by_default = 0
+    let g:vimfiler_force_overwrite_statusline = 0
+    let g:vimfiler_no_default_key_mappings = 1
+    let g:vimfiler_enable_auto_cd = 1			
+    autocmd FileType vimfiler map <buffer> <CR> <Plug>(vimfiler_smart_l)
+    autocmd FileType vimfiler map <buffer> l <Plug>(vimfiler_smart_l)
+    autocmd FileType vimfiler map <buffer> h <Plug>(vimfiler_smart_h)
+    autocmd FileType vimfiler map <buffer> n <Plug>(vimfiler_new_file)
+    autocmd FileType vimfiler map <buffer> cw <Plug>(vimfiler_rename_file)
+    autocmd FileType vimfiler map <buffer> <C-d> <Plug>(vimfiler_mark_current_line)<Plug>(vimfiler_delete_file)
+    autocmd FileType vimfiler map <buffer> md <Plug>(vimfiler_make_directory)
+    autocmd FileType vimfiler map <buffer> m <Plug>(vimfiler_toggle_mark_current_line)
+    autocmd FileType vimfiler map <buffer> zh <Plug>(vimfiler_toggle_visible_ignore_files)
+    autocmd FileType vimfiler map <buffer> yy <Plug>(vimfiler_mark_current_line)<Plug>(vimfiler_clipboard_copy_file)
+    autocmd FileType vimfiler map <buffer> dd <Plug>(vimfiler_mark_current_line)<Plug>(vimfiler_clipboard_move_file)
+    autocmd FileType vimfiler map <buffer> pp <Plug>(vimfiler_clipboard_paste)yes<CR>
+    autocmd FileType vimfiler setlocal nonumber
+    autocmd FileType vimfiler setlocal cursorline
+    map <silent> <C-f> :VimFilerExplorer -split -parent -toggle -simple -winwidth=30 -no-quit<CR>
+{% endif %}
+
+
+call plug#end()
+{% endif %}
+
+
+" -------------------------------------------------
+" Key binding behavior 
+" -------------------------------------------------
+" Milliseconds waited for mapped sequence completion
+set timeoutlen=500
+
+
+" -------------------------------------------------
+" Indentation 
+" -------------------------------------------------
+" convert tabs to spaces
+set expandtab
+
+" insert spaces according to shiftwidth
+set smarttab
+
+" number of spaces per tab
+set tabstop=2
+
+" white spaces removed on backspace
+set softtabstop=2
+
+" whitespaces per indent when shifting 
+set shiftwidth=2
+
+" round indentation to multiple of shiftwidth when shifting lines
+set shiftround      
+
+" new line inherits indentation of previous line
+set autoindent      
+
+" auto-indent new lew line
+set smartindent
+
+" C indentation rules
+set cindent
+
+
+" -------------------------------------------------
+" Backup / swap 
+" -------------------------------------------------
+" disable backup file autocreation
+set nobackup
+
+" write buffer directly to source file
+set nowritebackup
+
+" disable swap file creation
+set noswapfile
+
+
+" -------------------------------------------------
+" Search 
+" -------------------------------------------------
+" Incremental search (show partial matches)     
+set incsearch
+
+" highlight search results
+set hlsearch 
+
+" case-insensative search when query is all lowercase
+set ignorecase
+
+" case-senstive when query contains uppercase
+set smartcase
+
+" clear highlight key bindings
+noremap <silent> <leader><CR> :nohlsearch<CR>
+noremap <silent> <ESC> :nohlsearch<CR>
+
+" search selection backwards key binding
+vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+
+" search selection forwards key binding
+vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
+
+
+" -------------------------------------------------
+" Text rendering 
+" -------------------------------------------------
+" Unicode
+set encoding=utf-8
+
+" Enable line wrapping
+set wrap
+
+" Avoid line wrapping mid-word
+set linebreak
+ 
+set textwidth=100
+
+
+" -------------------------------------------------
+" Scroll 
+" -------------------------------------------------
+set scrolloff=10    " Scroll offset
+
+
+" -------------------------------------------------
+" Clipboard integration
+" -------------------------------------------------
+set clipboard+=unnamedplus
+
+
+" -------------------------------------------------
+" User interface 
+" -------------------------------------------------
+{% if neovim.plugins.nord_vim.enable %}
+colorscheme nord
+{% endif %}
+
+" GUI cursor
+set guicursor=
+
+" display line numbers
+set number
+
+" always display status bar
+set laststatus=2
+
+" set height of command line
+set cmdheight=1     
+
+" disable rendering of current mode in command line 
+set noshowmode
+
+set selection=exclusive
+set autochdir
+
+" enable command line tab completion
+set wildmenu
+
+" show matching brackets?
+set showmatch
+
+" hides unwritten buffer instead closing when opening new file
+set hidden
+
+" display current position
+set ruler
+
+" regular expressions
+set magic           
+
+
+" -------------------------------------------------
+" Bells & alerts
+" -------------------------------------------------
+set noerrorbells
+set novisualbell
+set t_vb=
+
+
+" -------------------------------------------------
+" Backspace behavior
+" -------------------------------------------------
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+
+" -------------------------------------------------
+" Searching 
+" -------------------------------------------------
+" toggle paste mode
+map <silent> <leader>pp :setlocal paste!<CR>
+
+" toggle spellcheck
+map <silent> <leader>ss :setlocal spell!<CR>
+
+
+" -------------------------------------------------
+" Buffer management
+" -------------------------------------------------
+" edit <file>
+nnoremap <leader>be :edit<SPACE>
+
+" next buffer
+nnoremap <silent> <leader>bj :bnext<CR>
+
+" previous buffer
+nnoremap <silent> <leader>bk :bprevious<CR>
+
+" new empty buffer
+nnoremap <silent> <leader>bn :enew<CR>
+
+" write buffer
+nnoremap <silent> <leader>bw :write!<CR>
+
+" delete buffer
+nnoremap <silent> <leader>bd :bdelete!<CR>
+
+" return to last edit position
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+" handle non-Vim files
+au BufRead *.pdf,*.jpg,*.png,*.gif sil exe "!xdg-open " . shellescape(expand("%:p")) | bd | let &ft=&ft | redraw!
+
+" set CWD to directory of the current buffer
+map <leader>cd :cd %:p:h<cr>:pwd<cr>
+
+" Detect external file changes 
+set autoread
+au FocusGained,BufEnter * checktime
+
+
+" -------------------------------------------------
+" Window splits
+" -------------------------------------------------
+" horizontal split position
+set splitbelow      
+
+" vertical split position
+set splitright 
+
+" horizontal split key binding
+nnoremap <silent> <C-h> :split<CR>
+"
+" vertical split key binding
+nnoremap <silent> <C-l> :vsplit<CR>
+
+" close split key binding
+nnoremap <silent> <C-c> :close!<CR>
+
+" move to previous window (anti-clockwise)
+nnoremap <C-j> <C-w>W
+tnoremap <C-j> <C-\><C-n><CR><C-w>W
+
+" move to next window (clockwise)
+nnoremap <C-k> <C-w>w
+tnoremap <C-k> <C-\><C-n><CR><C-w>w
+
+nnoremap <C-x> <C-w>x
+tnoremap <C-x> <C-\><C-n><CR><C-w>x
+
+nnoremap <silent> <C-down> :resize -1<CR>
+nnoremap <silent> <C-up> :resize +1<CR>
+nnoremap <silent> <C-left> :vertical resize -1<CR>
+nnoremap <silent> <C-right> :vertical resize +1<CR> 
+
+" -------------------------------------------------
+" Terminal 
+" -------------------------------------------------
+" no line numbers in Terminal
+au TermOpen * setlocal nonumber norelativenumber
+" 
+" insert mode in Terminal
+au BufEnter * if &buftype == 'terminal' | :startinsert! | endif
+
+" toggle terminal panel
+nnoremap <silent> <C-t> :call Term_toggle()<cr>
+tnoremap <silent> <C-t> <C-\><C-n><CR> :call Term_toggle()<cr>
+
+" exit insert mode
+tnoremap <silent> <ESC> <C-\><C-n><CR>
+
+let g:term_buf = 0
+    function! Term_toggle()
+        1wincmd l
+        if g:term_buf == bufnr("")
+            setlocal bufhidden=hide
+            close
+        else
+            bot vsplit new
+            " 12winc -
+            " exec "resize " . 15 
+            exec "vertical resize " . 75 
+            try
+                exec "buffer ".g:term_buf
+            catch
+                call termopen("zsh", {"detach": 0})
+                let g:term_buf = bufnr("")
+            endtry
+            startinsert!
+        endif
+    endfunction

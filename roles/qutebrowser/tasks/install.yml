@@ -1,0 +1,37 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - user is defined
+      - qutebrowser.config.dir is defined
+    quiet: true
+
+- name: install | apt install
+  apt:
+    update_cache: true
+    state: latest
+    pkg:
+      - qutebrowser
+
+- name: install | create necessary directories
+  become_user: "{{ user }}"
+  file:
+    path: "{{ qutebrowser.config.dir }}" 
+    state: directory
+
+- name: install | render config from template
+  become_user: "{{ user }}"
+  template:
+    src: "{{ item[0] }}"
+    dest: "{{ qutebrowser.config.dir + '/' + item[1] }}"
+  with_together:
+    - ['config.py.j2','nord-qutebrowser.py.j2']
+    - ['config.py','nord-qutebrowser.py']
+
+- name: install | set default web browser 
+  alternatives:
+    name: x-www-browser 
+    link: /usr/bin/x-www-browser
+    path: /usr/bin/qutebrowser
+    priority: 50

@@ -1,0 +1,4 @@
+---
+compton:
+  config:
+    dir: "~/.config/compton"

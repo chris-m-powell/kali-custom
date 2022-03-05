@@ -1,0 +1,22 @@
+---
+- name: Upgrade OS
+  apt:
+    upgrade: dist
+  async: 3600
+  poll: 0
+  changed_when: false
+  register: dist_upgrade 
+  when:
+    - not ansible_check_mode
+
+- name: Wait to upgrade OS
+  async_status:
+    jid: "{{ dist_upgrade.ansible_job_id }}"
+  until: job_result.finished
+  retries: 360
+  delay: 10
+  register: job_result
+  notify:
+    - reboot
+  when:
+    - not ansible_check_mode

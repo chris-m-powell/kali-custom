@@ -1,0 +1,4 @@
+---
+- name: reboot 
+  command: shutdown -r -t 30
+  listen: reboot

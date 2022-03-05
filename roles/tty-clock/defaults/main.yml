@@ -1,0 +1,4 @@
+---
+tty_clock:
+  repo: "github.com/xorg62/tty-clock.git"
+  dest: "/tmp/tty-clock"

@@ -1,0 +1,12 @@
+---
+misc_utils:
+  pkg_list:
+    - ncdu
+    - htop
+    - tree
+    - ncat
+    - nmap
+    - lynis
+    - rkhunter
+    - hydra
+    - dc3dd

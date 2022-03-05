@@ -1,0 +1,49 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - user is defined
+      - compton.config.dir is defined
+
+- name: install | apt install
+  apt:
+    update_cache: true
+    state: latest
+    pkg:
+      - compton
+
+- name: install | deploy configurations
+  become_user: "{{ user }}"
+  block:
+    - name: install | create necessary directories
+      file:
+        path: "{{ item }}" 
+        state: directory
+      loop:
+        - "{{ compton.config.dir }}"
+        - ~/.config/autostart
+
+    - name: install | render configurations from template
+      template:
+        src: "compton.conf.j2" 
+        dest: "{{ compton.config.dir }}/compton.conf"
+
+    - name: install | enable autostart 
+      copy:
+        src: compton.desktop
+        dest: ~/.config/autostart
+
+    - name: install | xfce-specific tasks
+      block:
+        - name: install | check xfwm default compositor
+          command: xfconf-query -c xfwm4 -p /general/use_compositing
+          changed_when: false
+          register: xfwm_default_compositor
+
+        - name: install | disable xfwm default compositor
+          command: xfconf-query -c xfwm4 -p /general/use_compositing -s false  
+          when:
+            - xfwm_default_compositor.stdout | bool 
+      when:
+        - '"kali-desktop-xfce" in ansible_facts.packages'

@@ -1,0 +1,4 @@
+---
+gotop:
+  repo: "github.com/cjbassi/gotop.git"
+  dest: "/tmp/gotop"
