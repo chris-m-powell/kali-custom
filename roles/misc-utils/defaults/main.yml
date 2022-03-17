@@ -4,9 +4,14 @@ misc_utils:
     - ncdu
     - htop
     - tree
+    - jq
+    - python3-impacket
     - ncat
     - nmap
     - lynis
+    - strace
+    - ltrace
     - rkhunter
     - hydra
     - dc3dd
+    - bettercap

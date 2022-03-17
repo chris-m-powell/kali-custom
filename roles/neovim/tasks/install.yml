@@ -83,7 +83,7 @@
     purge: true
     autoremove: true
 
-- name: install | remove
+- name: install | remove vim artifacts
   file:
     path: "{{ item }}" 
     state: absent
