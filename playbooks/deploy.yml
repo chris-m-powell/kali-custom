@@ -15,14 +15,14 @@
   hosts: Kali
   become: true
   gather_facts: false
+  vars:
+    includes_dir: "{{ playbook_dir + '/includes' }}"
   handlers:
-    - import_tasks: "{{ playbook_dir + '/includes/handlers.yml' }}"
-      tags:
-        - always
+    - import_tasks: "{{ includes_dir + '/handlers.yml' }}"
   pre_tasks:
     - block:
-        - import_tasks: "{{ playbook_dir + '/includes/package_facts.yml' }}"
-        - import_tasks: "{{ playbook_dir + '/includes/service_facts.yml' }}"
+        - import_tasks: "{{ includes_dir + '/package_facts.yml' }}"
+        - import_tasks: "{{ includes_dir + '/service_facts.yml' }}"
       tags:
         - always
   roles:
@@ -38,6 +38,7 @@
     - ranger
     - tty-clock
   post_tasks:
-    - import_tasks: "{{ playbook_dir + '/includes/dist_upgrade.yml' }}"
+    - block:
+        - import_tasks: "{{ includes_dir + '/dist_upgrade.yml' }}"
       tags:
         - always
