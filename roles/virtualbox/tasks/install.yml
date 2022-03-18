@@ -1,0 +1,81 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - virtualbox.repo.key
+      - virtualbox.repo.keyring
+      - virtualbox.repo.url
+      - virtualbox.repo.arch
+      - virtualbox.repo.debian_release
+    quiet: true
+
+- name: install | apt install
+  apt:
+    update_cache: true
+    state: present
+    pkg:
+      - facter 
+
+- name: install | detect if host is virtual or physical
+  shell: facter 2> /dev/null | awk '$1~/is_virtual/ { print $3 }' 
+  register: is_virtual
+
+- name: install | report host status
+  debug:
+    msg: This system is virtual, skipping VirtualBox installation... 
+  when:
+    - is_virtual.stdout | bool
+
+- name: install | initiate install procedure
+  block:
+    - name: install | check if repository keyring exists
+      stat:
+        path: "{{ virtualbox.repo.keyring }}"
+      register: repo_keyring
+
+    - name: install | import repository key
+      block:
+        - name: install | download ASCII-armored OpenPGP repository key
+          get_url:
+            url: "{{ 'https://' + virtualbox.repo.key }}" 
+            dest: /tmp
+          register: repo_key
+
+        - name: install | unpack ASCII-armored OpenPGP repository key
+          shell: cat "{{ repo_key.dest }}" | gpg --dearmor
+          register: output
+
+        - name: install | import GPG key binary to keyring
+          copy:
+            content: "{{ output.stdout }}"
+            dest: "{{ virtualbox.repo.keyring }}" 
+
+        - name: install | remove artifacts 
+          file:
+            path: "{{ repo_key.dest }}"
+            state: absent
+      when:
+        - not repo_keyring.stat.exists
+
+    - name: install | add repository
+      copy:
+        content: >
+          deb
+          [arch={{ virtualbox.repo.arch }} signed-by={{ virtualbox.repo.keyring }}]
+          {{ virtualbox.repo.url }}
+          {{ virtualbox.repo.debian_release }}
+          contrib
+        dest: /etc/apt/sources.list.d/virtualbox.list
+
+    - name: install | apt install
+      apt:
+        update_cache: true
+        state: latest
+        pkg:
+          - dkms 
+          - virtualbox
+      notify:
+        - virtualbox-ext-pack
+  when:
+    - not is_virtual.stdout | bool

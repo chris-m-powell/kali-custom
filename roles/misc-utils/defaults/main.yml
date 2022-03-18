@@ -4,6 +4,7 @@ misc_utils:
     - ncdu
     - htop
     - tree
+    - cmatrix
     - jq
     - python3-impacket
     - ncat

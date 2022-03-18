@@ -37,6 +37,7 @@
     - qutebrowser
     - ranger
     - tty-clock
+    - virtualbox
   post_tasks:
     - block:
         - import_tasks: "{{ includes_dir + '/dist_upgrade.yml' }}"

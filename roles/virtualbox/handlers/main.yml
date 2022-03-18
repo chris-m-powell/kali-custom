@@ -1,0 +1,5 @@
+---
+- name: install | -- manual post-install task required --
+  debug:
+    msg: Download 'virtualbox-ext-pack' via APT and accept EULA to complete VirtualBox installation.
+  listen: virtualbox-ext-pack

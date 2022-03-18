@@ -1,0 +1,10 @@
+---
+virtualbox:
+  repo:
+    url: "http://download.virtualbox.org/virtualbox/debian"
+    key: "www.virtualbox.org/download/oracle_vbox_2016.asc"
+    keyring: "/usr/share/keyrings/virtualbox-archive-keyring.gpg"
+    arch: "amd64"
+    debian_release: "bullseye"
+
+  

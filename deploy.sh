@@ -30,8 +30,13 @@ END
 
 function display_help() {
   echo -e "\nUSAGE:\n"
-  echo -e "\tcurl -s https://raw.githubusercontent.com/chris-m-powell/kali-build/master/deploy.sh | sudo /bin/bash -s -- [-u <kali user>] [-t <tag1,tag2,...>]"
+  echo -e "\tcurl -s https://raw.githubusercontent.com/chris-m-powell/kali-build/master/deploy.sh | sudo bash -s -- [<options>]"
+  echo -e "\nOPTIONS:\n"
+  echo -e "\t-u           \tName of local Kali user"
+  echo -e "\t-k           \tComma-delimited list of tags (defaults to 'all')"
+  echo -e "\t-h           \tDisplays usage options"
   echo -e "\nSUPPORTED TAGS:\n"
+  echo -e "\tall          \tApply all custom configurations"
   echo -e "\talacritty    \tFast, cross-platform, OpenGL terminal emulator"
   echo -e "\tcompton      \tCompositor for X"
   echo -e "\tdiscord      \tVoIP, instant messaging, and digital distribution platform"
@@ -41,7 +46,8 @@ function display_help() {
   echo -e "\tneovim       \tRefactor of Vim, focused on extensibility and usability"
   echo -e "\tqutebrowser  \tKeyboard-driven, vim-like browser based on PyQt5"
   echo -e "\tranger       \tTerminal-based, visual file manager inspired by Vim"
-  echo -e "\ttty-clock    \tTerminal clock"
+  echo -e "\ttty-clock    \tSimple terminal clock"
+  echo -e "\tvirtualbox   \tx86 virtualization solution"
   exit 1
 }
 
