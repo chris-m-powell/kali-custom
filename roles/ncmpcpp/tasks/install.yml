@@ -3,7 +3,7 @@
   run_once: true
   assert:
     that:
-      - neofetch.config.dir is defined
+      - ncmpcpp.config.dir is defined
     quiet: true
 
 - name: install | apt install
@@ -11,16 +11,19 @@
     update_cache: true
     state: latest
     pkg:
-      - neofetch
+      - ncmpcpp
 
 - name: install | create necessary directories
   become_user: "{{ user }}"
   file:
-    path: "{{ neofetch.config.dir }}" 
+    path: "{{ ncmpcpp.config.dir }}" 
     state: directory
 
-- name: install | render config from template
+- name: install | deploy configuration files 
   become_user: "{{ user }}"
-  template:
-    src: "config.conf.j2"
-    dest: "{{ neofetch.config.dir + '/config.conf' }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ ncmpcpp.config.dir + '/' + item }}"
+  loop:
+    - config
+    - bindings

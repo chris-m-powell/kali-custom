@@ -32,8 +32,10 @@
     - discord
     - gotop
     - misc-utils
+    - mpd
     - neofetch
     - neovim
+    - ncmpcpp
     - qutebrowser
     - ranger
     - tty-clock

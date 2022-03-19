@@ -1,5 +1,5 @@
 ---
-- name: install | validate task list parameters
+- name: install | validate parameters
   run_once: true
   assert:
     that:
@@ -49,7 +49,7 @@
       when:
         - neovim.vim_plug.enable
         
-    - name: install | deploy plug-ins
+    - name: install | deploy plug-ins updates
       git:
         repo: "{{ 'https://' + item.value.repo }}"
         dest: "{{ item.value.dest }}"
@@ -62,12 +62,12 @@
         - neovim.vim_plug.preinstall_plugins
       loop: "{{ neovim.plugins | dict2items }}"
 
-    - name: install | render vim config from template
+    - name: install | render config from template
       template:
         src: init.vim.j2
         dest: "{{ neovim.config.dir + '/init.vim' }}"
 
-- name: install | apt purge vim
+- name: install | remove Vim, Emacs, and Nano
   apt:
     pkg:
       - vim 
@@ -79,14 +79,18 @@
       - vim-gui-common
       - vim-nox
       - vim-tiny
+      - nano
+      - emacs
     state: absent
     purge: true
     autoremove: true
 
-- name: install | remove vim artifacts
+- name: install | remove leftover artifacts
   file:
     path: "{{ item }}" 
     state: absent
   loop:
     - /usr/bin/vim
     - /usr/share/vim
+    - /etc/emacs
+    - /usr/share/emacs

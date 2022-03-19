@@ -1,5 +1,5 @@
 ---
-- name: install | validate task list parameters
+- name: install | validate parameters
   run_once: true
   assert:
     that:

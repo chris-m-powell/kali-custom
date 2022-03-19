@@ -1,17 +1,17 @@
 ---
 - name: Gather service facts
   service_facts:
-  async: 3600
-  poll: 0
+  # async: 3600
+  # poll: 0
   check_mode: false
   changed_when: false
-  register: installed_services
+  # register: installed_services
 
-- name: Wait to gather service facts
-  async_status:
-    jid: "{{ installed_services.ansible_job_id }}"
-  until: job_result.finished
-  retries: 10
-  delay: 3
-  check_mode: false
-  register: job_result
+# - name: Wait to gather service facts
+#   async_status:
+#     jid: "{{ installed_services.ansible_job_id }}"
+#   until: job_result.finished
+#   retries: 10
+#   delay: 3
+#   check_mode: false
+#   register: job_result
