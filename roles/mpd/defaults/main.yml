@@ -3,9 +3,21 @@ mpd:
   config:
     dir: "~/.config/mpd"
     attr:
+      bind_to_address: "0.0.0.0"
       playlist_directory: "~/.mpd/playlists"
       music_directory: "~/Music"
       db_file: "~/.mpd/mpd.db"
       log_file: "~/.mpd/mpd.log"
       pid_file: "~/.mpd/mpd.pid"
       state_file: "~/.mpd/mpdstate"
+      mixer_type: "software"
+      audio_output:
+        pulse:
+          type: "pulse"
+          name: "pulse audio"
+          mixer_type: "hardware"
+        fifo:
+          type: "fifo"
+          name: "my_fifo"
+          path: "/tmp/mpd.fifo"
+          format:  "44100:16:2"

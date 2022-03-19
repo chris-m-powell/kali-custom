@@ -1,23 +1,21 @@
- bind_to_address    "127.0.0.1"
- #bind_to_address   "~/.mpd/socket"
+ bind_to_address    "{{ mpd.config.attr.bind_to_address }}"
  music_directory    "{{ mpd.config.attr.music_directory }}"
  playlist_directory "{{ mpd.config.attr.playlist_directory }}"   
  db_file            "{{ mpd.config.attr.db_file }}"
  log_file           "{{ mpd.config.attr.log_file }}"
  pid_file           "{{ mpd.config.attr.pid_file }}"
  state_file         "{{ mpd.config.attr.state_file }}"
- mixer_type         "software"
+ mixer_type         "{{ mpd.config.attr.mixer_type }}"
 
 audio_output {  
-  type        "pulse"  
-  name        "pulse audio"
-  device      "pulse" 
-  mixer_type  "hardware" 
+  type        "{{ mpd.config.attr.audio_output.pulse.type }}"  
+  name        "{{ mpd.config.attr.audio_output.pulse.name }}"
+  mixer_type  "{{ mpd.config.attr.audio_output.pulse.mixer_type }}" 
  }  
 
 audio_output {
-  type    "fifo"
-  name    "my_fifo"
-  path    "/tmp/mpd.fifo"
-  format  "44100:16:2"
+  type    "{{ mpd.config.attr.audio_output.fifo.type }}"
+  name    "{{ mpd.config.attr.audio_output.fifo.name }}"
+  path    "{{ mpd.config.attr.audio_output.fifo.path }}"
+  format  "{{ mpd.config.attr.audio_output.fifo.format }}"
 }

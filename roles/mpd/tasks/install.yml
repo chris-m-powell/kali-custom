@@ -4,12 +4,21 @@
   assert:
     that:
       - mpd.config.dir is defined
-      - mpd.config.attr.playlist_directory
-      - mpd.config.attr.music_directory
-      - mpd.config.attr.db_file
-      - mpd.config.attr.log_file
-      - mpd.config.attr.pid_file
-      - mpd.config.attr.state_file
+      - mpd.config.attr.bind_to_address is defined
+      - mpd.config.attr.music_directory is defined
+      - mpd.config.attr.playlist_directory is defined
+      - mpd.config.attr.db_file is defined
+      - mpd.config.attr.log_file is defined
+      - mpd.config.attr.pid_file is defined
+      - mpd.config.attr.state_file is defined
+      - mpd.config.attr.mixer_type is defined
+      - mpd.config.attr.audio_output.pulse.type is defined
+      - mpd.config.attr.audio_output.pulse.name is defined
+      - mpd.config.attr.audio_output.pulse.mixer_type is defined
+      - mpd.config.attr.audio_output.fifo.type is defined
+      - mpd.config.attr.audio_output.fifo.name is defined
+      - mpd.config.attr.audio_output.fifo.path is defined
+      - mpd.config.attr.audio_output.fifo.format is defined
     quiet: true
 
 - name: install | apt install
@@ -19,30 +28,37 @@
     pkg:
       - mpd
 
-- name: install | create necessary directories
+- name: install | apply local configurations
   become_user: "{{ user }}"
-  file:
-    path: "{{ item }}" 
-    state: directory
-  loop:
-    - "{{ mpd.config.dir }}"
-    - "{{ mpd.config.attr.playlist_directory }}"
-    - "{{ mpd.config.attr.music_directory }}"
+  block:
+    - name: install | create necessary directories
+      file:
+        path: "{{ item }}" 
+        state: directory
+      loop:
+        - "{{ mpd.config.dir }}"
+        - "{{ mpd.config.attr.playlist_directory }}"
+        - "{{ mpd.config.attr.music_directory }}"
 
-- name: install | create necessary files
-  become_user: "{{ user }}"
-  file:
-    path: "{{ item }}" 
-    state: touch
-  changed_when: false
-  loop:
-    - "{{ mpd.config.attr.db_file }}"
-    - "{{ mpd.config.attr.log_file }}"
-    - "{{ mpd.config.attr.pid_file }}"
-    - "{{ mpd.config.attr.state_file }}"
+    - name: install | create necessary files
+      file:
+        path: "{{ item }}" 
+        state: touch
+      changed_when: false
+      loop:
+        - "{{ mpd.config.attr.db_file }}"
+        - "{{ mpd.config.attr.log_file }}"
+        - "{{ mpd.config.attr.pid_file }}"
+        - "{{ mpd.config.attr.state_file }}"
 
-- name: install | render config from template
-  become_user: "{{ user }}"
-  template:
-    src: "mpd.conf.j2"
-    dest: "{{ mpd.config.dir + '/mpd.conf' }}"
+    - name: install | render config from template
+      template:
+        src: "mpd.conf.j2"
+        dest: "{{ mpd.config.dir + '/mpd.conf' }}"
+
+    - name: install | start and enable service with user scope
+      systemd:
+        name: mpd
+        state: started
+        enabled: true
+        scope: user

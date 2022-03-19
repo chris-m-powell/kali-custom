@@ -2,3 +2,12 @@
 ncmpcpp:
   config:
     dir: "~/.config/ncmpcpp"
+    attr:
+      ncmpcpp_directory: "~/.config/ncmcpp"
+      mpd_music_dir: "~/Music"
+      lyrics_directory: "~/.config/ncmpcpp/lyrics"
+    bindings:
+      next_column: "l"
+      previous_column: "h"
+      scroll_up: "k"
+      scroll_down: "j"

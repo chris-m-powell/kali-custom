@@ -4,6 +4,13 @@
   assert:
     that:
       - ncmpcpp.config.dir is defined
+      - ncmpcpp.config.attr.ncmpcpp_directory
+      - ncmpcpp.config.attr.mpd_music_dir
+      - ncmpcpp.config.attr.lyrics_directory
+      - ncmpcpp.config.bindings.next_column is defined
+      - ncmpcpp.config.bindings.previous_column is defined
+      - ncmpcpp.config.bindings.scroll_up is defined
+      - ncmpcpp.config.bindings.scroll_down is defined
     quiet: true
 
 - name: install | apt install
@@ -19,10 +26,10 @@
     path: "{{ ncmpcpp.config.dir }}" 
     state: directory
 
-- name: install | deploy configuration files 
+- name: install | render config from template
   become_user: "{{ user }}"
-  copy:
-    src: "{{ item }}"
+  template:
+    src: "{{ item + '.j2' }}"
     dest: "{{ ncmpcpp.config.dir + '/' + item }}"
   loop:
     - config
