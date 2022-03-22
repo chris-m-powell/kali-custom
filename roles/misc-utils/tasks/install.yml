@@ -2,5 +2,11 @@
 - name: install | install or update common utilities
   apt:
     update_cache: true
-    pkg: "{{ misc_utils.pkg_list }}"
+    pkg: "{{ misc_utils.pkg.apt }}"
     state: latest
+
+- name: install | pip install
+  pip:
+    name: "{{ misc_utils.pkg.pip }}" 
+    state: latest
+    extra_args: --user

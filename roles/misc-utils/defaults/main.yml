@@ -1,18 +1,20 @@
 ---
 misc_utils:
-  pkg_list:
-    - ncdu
-    - htop
-    - tree
-    - cmatrix
-    - jq
-    - python3-impacket
-    - ncat
-    - nmap
-    - lynis
-    - strace
-    - ltrace
-    - rkhunter
-    - hydra
-    - dc3dd
-    - bettercap
+  pkg:
+    apt:
+      - ncdu
+      - htop
+      - tree
+      - cmatrix
+      - jq
+      - ncat
+      - nmap
+      - lynis
+      - strace
+      - ltrace
+      - rkhunter
+      - hydra
+      - dc3dd
+      - bettercap
+    pip:
+      - impacket
