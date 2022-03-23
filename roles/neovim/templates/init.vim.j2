@@ -1,10 +1,6 @@
 let mapleader = " "
 
-
 {% if neovim.vim_plug.enable %}
-" -------------------------------------------------
-" Install vim-plug 
-" -------------------------------------------------
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -14,17 +10,10 @@ endif
 call plug#begin('~/.local/share/nvim/plugged')
 
 {% if neovim.plugins.ale.enable %}
-" -------------------------------------------------
-" Asynchronous LINT Engine 
-" -------------------------------------------------
-" Plug 'w0rp/ale'
 Plug 'dense-analysis/ale'
 {% endif %}
 
 {% if neovim.plugins.ale.enable %}
-" -------------------------------------------------
-" Lightline 
-" -------------------------------------------------
 Plug 'itchyny/lightline.vim'
     let g:lightline = {
         \ 'colorscheme': 'nord',
@@ -49,44 +38,23 @@ Plug 'itchyny/lightline.vim'
         \     'linter_errors': 'error',
         \     'linter_ok': 'left',
         \ }
-    " let g:lightline.tabline = {
-        " \   'left': [ ['tabs'] ],
-        " \   'right': [ ['close'] ]
-        " \ }
-    " set showtabline=2  " Show tabline
-    " set guioptions-=e  " Don't use GUI tabline
 {% endif %}
 
 {% if neovim.plugins.lightline_ale.enable %}
-" -------------------------------------------------
-" Lightline-ALE integration 
-" -------------------------------------------------
 Plug 'maximbaz/lightline-ale'
 {% endif %}
 
-
 {% if neovim.plugins.nord_vim.enable %}
-" -------------------------------------------------
-" Nord theme 
-" -------------------------------------------------
 Plug 'arcticicestudio/nord-vim'
 {% endif %}
 
-
 {% if neovim.plugins.vim_commentary.enable %}
-" -------------------------------------------------
-" Comment/uncommenting 
-" -------------------------------------------------
 Plug 'tpope/vim-commentary'
     nmap <leader>c <Plug>CommentaryLine
     vmap <leader>c <Plug>Commentary
 {% endif %}
 
-
 {% if neovim.plugins.unite.enable and neovim.plugins.unite.enable %}
-" -------------------------------------------------
-" File explorer 
-" -------------------------------------------------
 Plug 'Shougo/unite.vim' | Plug 'Shougo/vimfiler.vim'
     let g:vimfiler_as_default_explorer = 1
     let g:vimfiler_safe_mode_by_default = 0
@@ -110,76 +78,20 @@ Plug 'Shougo/unite.vim' | Plug 'Shougo/vimfiler.vim'
     map <silent> <C-f> :VimFilerExplorer -split -parent -toggle -simple -winwidth=30 -no-quit<CR>
 {% endif %}
 
-
 call plug#end()
 {% endif %}
 
+{% for item in neovim.config.dict | dict2items -%} 
+set {{ item.key }}={{ item.value }}
+{% endfor %}
 
-" -------------------------------------------------
-" Key binding behavior 
-" -------------------------------------------------
-" Milliseconds waited for mapped sequence completion
-set timeoutlen=500
+{% for item in neovim.config.list -%}
+set {{ item }}
+{% endfor %}
 
-
-" -------------------------------------------------
-" Indentation 
-" -------------------------------------------------
-" convert tabs to spaces
-set expandtab
-
-" insert spaces according to shiftwidth
-set smarttab
-
-" number of spaces per tab
-set tabstop=2
-
-" white spaces removed on backspace
-set softtabstop=2
-
-" whitespaces per indent when shifting 
-set shiftwidth=2
-
-" round indentation to multiple of shiftwidth when shifting lines
-set shiftround      
-
-" new line inherits indentation of previous line
-set autoindent      
-
-" auto-indent new lew line
-set smartindent
-
-" C indentation rules
-set cindent
-
-
-" -------------------------------------------------
-" Backup / swap 
-" -------------------------------------------------
-" disable backup file autocreation
-set nobackup
-
-" write buffer directly to source file
-set nowritebackup
-
-" disable swap file creation
-set noswapfile
-
-
-" -------------------------------------------------
-" Search 
-" -------------------------------------------------
-" Incremental search (show partial matches)     
-set incsearch
-
-" highlight search results
-set hlsearch 
-
-" case-insensative search when query is all lowercase
-set ignorecase
-
-" case-senstive when query contains uppercase
-set smartcase
+{% if neovim.plugins.nord_vim.enable %}
+colorscheme nord
+{% endif %}
 
 " clear highlight key bindings
 noremap <silent> <leader><CR> :nohlsearch<CR>
@@ -191,103 +103,12 @@ vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
 " search selection forwards key binding
 vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
-
-" -------------------------------------------------
-" Text rendering 
-" -------------------------------------------------
-" Unicode
-set encoding=utf-8
-
-" Enable line wrapping
-set wrap
-
-" Avoid line wrapping mid-word
-set linebreak
- 
-set textwidth=100
-
-
-" -------------------------------------------------
-" Scroll 
-" -------------------------------------------------
-set scrolloff=10    " Scroll offset
-
-
-" -------------------------------------------------
-" Clipboard integration
-" -------------------------------------------------
-set clipboard+=unnamedplus
-
-
-" -------------------------------------------------
-" User interface 
-" -------------------------------------------------
-{% if neovim.plugins.nord_vim.enable %}
-colorscheme nord
-{% endif %}
-
-" GUI cursor
-set guicursor=
-
-" display line numbers
-set number
-
-" always display status bar
-set laststatus=2
-
-" set height of command line
-set cmdheight=1     
-
-" disable rendering of current mode in command line 
-set noshowmode
-
-set selection=exclusive
-set autochdir
-
-" enable command line tab completion
-set wildmenu
-
-" show matching brackets?
-set showmatch
-
-" hides unwritten buffer instead closing when opening new file
-set hidden
-
-" display current position
-set ruler
-
-" regular expressions
-set magic           
-
-
-" -------------------------------------------------
-" Bells & alerts
-" -------------------------------------------------
-set noerrorbells
-set novisualbell
-set t_vb=
-
-
-" -------------------------------------------------
-" Backspace behavior
-" -------------------------------------------------
-set backspace=eol,start,indent
-set whichwrap+=<,>,h,l
-
-
-" -------------------------------------------------
-" Searching 
-" -------------------------------------------------
 " toggle paste mode
 map <silent> <leader>pp :setlocal paste!<CR>
 
 " toggle spellcheck
 map <silent> <leader>ss :setlocal spell!<CR>
 
-
-" -------------------------------------------------
-" Buffer management
-" -------------------------------------------------
 " edit <file>
 nnoremap <leader>be :edit<SPACE>
 
@@ -319,16 +140,6 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 set autoread
 au FocusGained,BufEnter * checktime
 
-
-" -------------------------------------------------
-" Window splits
-" -------------------------------------------------
-" horizontal split position
-set splitbelow      
-
-" vertical split position
-set splitright 
-
 " horizontal split key binding
 nnoremap <silent> <C-h> :split<CR>
 "
@@ -354,9 +165,6 @@ nnoremap <silent> <C-up> :resize +1<CR>
 nnoremap <silent> <C-left> :vertical resize -1<CR>
 nnoremap <silent> <C-right> :vertical resize +1<CR> 
 
-" -------------------------------------------------
-" Terminal 
-" -------------------------------------------------
 " no line numbers in Terminal
 au TermOpen * setlocal nonumber norelativenumber
 " 

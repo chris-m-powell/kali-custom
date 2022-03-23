@@ -37,6 +37,47 @@ neovim:
       enable: true
   config:
     dir: "~/.config/nvim"
-    tabstop: 2
-    softtabstop: 2
-    shiftwidth: 2
+    dict:
+      timeoutlen: "500"
+      tabstop: "2"
+      softtabstop: "2"
+      shiftwidth: "2"
+      encoding: "utf-8"
+      textwidth: "100"
+      scrolloff: "10"
+      clipboard+: "unnamedplus"
+      guicursor: ""
+      laststatus: "2"
+      cmdheight: "1"
+      selection: "exclusive"
+      t_vb: ""
+      backspace: "eol,start,indent"
+      whichwrap+: "<,>,h,l"
+    list:
+      - expandtab
+      - smarttab
+      - shiftround
+      - autoindent
+      - smartindent
+      - cindent
+      - nobackup
+      - nowritebackup
+      - noswapfile
+      - incsearch
+      - hlsearch
+      - ignorecase
+      - smartcase
+      - wrap
+      - linebreak
+      - number
+      - noshowmode
+      - autochdir
+      - wildmenu
+      - showmatch
+      - hidden
+      - ruler
+      - magic
+      - noerrorbells
+      - novisualbell
+      - splitbelow
+      - splitright
