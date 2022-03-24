@@ -37,47 +37,82 @@ neovim:
       enable: true
   config:
     dir: "~/.config/nvim"
-    dict:
-      timeoutlen: "500"
-      tabstop: "2"
-      softtabstop: "2"
-      shiftwidth: "2"
-      encoding: "utf-8"
-      textwidth: "100"
-      scrolloff: "10"
-      clipboard+: "unnamedplus"
-      guicursor: ""
-      laststatus: "2"
-      cmdheight: "1"
-      selection: "exclusive"
-      t_vb: ""
-      backspace: "eol,start,indent"
-      whichwrap+: "<,>,h,l"
-    list:
-      - expandtab
-      - smarttab
-      - shiftround
-      - autoindent
-      - smartindent
-      - cindent
-      - nobackup
-      - nowritebackup
-      - noswapfile
-      - incsearch
-      - hlsearch
-      - ignorecase
-      - smartcase
-      - wrap
-      - linebreak
-      - number
-      - noshowmode
-      - autochdir
-      - wildmenu
-      - showmatch
-      - hidden
-      - ruler
-      - magic
-      - noerrorbells
-      - novisualbell
-      - splitbelow
-      - splitright
+    set:
+      dict:
+        timeoutlen: "500"
+        tabstop: "2"
+        softtabstop: "2"
+        shiftwidth: "2"
+        encoding: "utf-8"
+        textwidth: "100"
+        scrolloff: "10"
+        clipboard+: "unnamedplus"
+        guicursor: ""
+        laststatus: "2"
+        cmdheight: "1"
+        selection: "exclusive"
+        t_vb: ""
+        backspace: "eol,start,indent"
+        whichwrap+: "<,>,h,l"
+      list:
+        - 'expandtab'
+        - 'smarttab'
+        - 'shiftround'
+        - 'autoindent'
+        - 'smartindent'
+        - 'cindent'
+        - 'nobackup'
+        - 'nowritebackup'
+        - 'noswapfile'
+        - 'incsearch'
+        - 'hlsearch'
+        - 'ignorecase'
+        - 'smartcase'
+        - 'wrap'
+        - 'linebreak'
+        - 'number'
+        - 'noshowmode'
+        - 'autochdir'
+        - 'wildmenu'
+        - 'showmatch'
+        - 'hidden'
+        - 'ruler'
+        - 'magic'
+        - 'noerrorbells'
+        - 'novisualbell'
+        - 'splitbelow'
+        - 'splitright'
+        - 'autoread'
+    nnoremap:
+      - '<silent> <leader>bj :bnext<CR>'
+      - '<silent> <leader>bk :bprevious<CR>'
+      - '<leader>be :edit<SPACE>'
+      - '<silent> <leader>bn :enew<CR>'
+      - '<silent> <leader>bd :bdelete!<CR>'
+      - '<silent> <leader>bw :write!<CR>'
+      - '<silent> <C-h> :split<CR>'
+      - '<silent> <C-l> :vsplit<CR>'
+      - '<silent> <C-c> :close!<CR>'
+      - '<C-j> <C-w>W'
+      - '<C-k> <C-w>w'
+      - '<C-x> <C-w>x'
+      - '<silent> <C-down> :resize -1<CR>'
+      - '<silent> <C-up> :resize +1<CR>'
+      - '<silent> <C-left> :vertical resize -1<CR>'
+      - '<silent> <C-right> :vertical resize +1<CR>'
+      - '<silent> <C-t> :call Term_toggle()<cr>'
+    tnoremap:
+      - '<C-j> <C-\><C-n><CR><C-w>W'
+      - '<C-k> <C-\><C-n><CR><C-w>w'
+      - '<C-x> <C-\><C-n><CR><C-w>x'
+      - '<silent> <ESC> <C-\><C-n><CR>'
+    map:
+      - '<silent> <leader>pp :setlocal paste!<CR>'
+      - '<silent> <leader>ss :setlocal spell!<CR>'
+      - '<leader>cd :cd %:p:h<cr>:pwd<cr>'
+    noremap:
+      - '<silent> <leader><CR> :nohlsearch<CR>'
+      - '<silent> <ESC> :nohlsearch<CR>'
+    vnoremap:
+      - '<silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>'
+      - '<silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>'

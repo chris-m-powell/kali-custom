@@ -6,6 +6,7 @@
     state: latest
 
 - name: install | pip install
+  become_user: "{{ user }}"
   pip:
     name: "{{ misc_utils.pkg.pip }}" 
     state: latest

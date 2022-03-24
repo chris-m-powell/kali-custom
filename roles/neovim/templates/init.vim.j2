@@ -8,11 +8,11 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.local/share/nvim/plugged')
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.ale.enable %}
 Plug 'dense-analysis/ale'
 {% endif %}
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.ale.enable %}
 Plug 'itchyny/lightline.vim'
     let g:lightline = {
@@ -39,21 +39,21 @@ Plug 'itchyny/lightline.vim'
         \     'linter_ok': 'left',
         \ }
 {% endif %}
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.lightline_ale.enable %}
 Plug 'maximbaz/lightline-ale'
 {% endif %}
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.nord_vim.enable %}
 Plug 'arcticicestudio/nord-vim'
 {% endif %}
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.vim_commentary.enable %}
 Plug 'tpope/vim-commentary'
     nmap <leader>c <Plug>CommentaryLine
     vmap <leader>c <Plug>Commentary
 {% endif %}
-
+{# -------------------------------------------------- #}
 {% if neovim.plugins.unite.enable and neovim.plugins.unite.enable %}
 Plug 'Shougo/unite.vim' | Plug 'Shougo/vimfiler.vim'
     let g:vimfiler_as_default_explorer = 1
@@ -77,55 +77,40 @@ Plug 'Shougo/unite.vim' | Plug 'Shougo/vimfiler.vim'
     autocmd FileType vimfiler setlocal cursorline
     map <silent> <C-f> :VimFilerExplorer -split -parent -toggle -simple -winwidth=30 -no-quit<CR>
 {% endif %}
-
 call plug#end()
 {% endif %}
 
-{% for item in neovim.config.dict | dict2items -%} 
+{% for item in neovim.config.set.dict | dict2items -%} 
 set {{ item.key }}={{ item.value }}
 {% endfor %}
 
-{% for item in neovim.config.list -%}
+{% for item in neovim.config.set.list -%}
 set {{ item }}
+{% endfor %}
+
+{% for item in neovim.config.map -%}
+map {{ item }}
+{% endfor %}
+
+{% for item in neovim.config.noremap -%}
+noremap {{ item }}
+{% endfor %}
+
+{% for item in neovim.config.nnoremap -%}
+nnoremap {{ item }}
+{% endfor %}
+
+{% for item in neovim.config.tnoremap -%}
+tnoremap {{ item }}
+{% endfor %}
+
+{% for item in neovim.config.vnoremap -%}
+vnoremap {{ item }}
 {% endfor %}
 
 {% if neovim.plugins.nord_vim.enable %}
 colorscheme nord
 {% endif %}
-
-" clear highlight key bindings
-noremap <silent> <leader><CR> :nohlsearch<CR>
-noremap <silent> <ESC> :nohlsearch<CR>
-
-" search selection backwards key binding
-vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
-
-" search selection forwards key binding
-vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
-
-" toggle paste mode
-map <silent> <leader>pp :setlocal paste!<CR>
-
-" toggle spellcheck
-map <silent> <leader>ss :setlocal spell!<CR>
-
-" edit <file>
-nnoremap <leader>be :edit<SPACE>
-
-" next buffer
-nnoremap <silent> <leader>bj :bnext<CR>
-
-" previous buffer
-nnoremap <silent> <leader>bk :bprevious<CR>
-
-" new empty buffer
-nnoremap <silent> <leader>bn :enew<CR>
-
-" write buffer
-nnoremap <silent> <leader>bw :write!<CR>
-
-" delete buffer
-nnoremap <silent> <leader>bd :bdelete!<CR>
 
 " return to last edit position
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -133,50 +118,14 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 " handle non-Vim files
 au BufRead *.pdf,*.jpg,*.png,*.gif sil exe "!xdg-open " . shellescape(expand("%:p")) | bd | let &ft=&ft | redraw!
 
-" set CWD to directory of the current buffer
-map <leader>cd :cd %:p:h<cr>:pwd<cr>
-
 " Detect external file changes 
-set autoread
 au FocusGained,BufEnter * checktime
-
-" horizontal split key binding
-nnoremap <silent> <C-h> :split<CR>
-"
-" vertical split key binding
-nnoremap <silent> <C-l> :vsplit<CR>
-
-" close split key binding
-nnoremap <silent> <C-c> :close!<CR>
-
-" move to previous window (anti-clockwise)
-nnoremap <C-j> <C-w>W
-tnoremap <C-j> <C-\><C-n><CR><C-w>W
-
-" move to next window (clockwise)
-nnoremap <C-k> <C-w>w
-tnoremap <C-k> <C-\><C-n><CR><C-w>w
-
-nnoremap <C-x> <C-w>x
-tnoremap <C-x> <C-\><C-n><CR><C-w>x
-
-nnoremap <silent> <C-down> :resize -1<CR>
-nnoremap <silent> <C-up> :resize +1<CR>
-nnoremap <silent> <C-left> :vertical resize -1<CR>
-nnoremap <silent> <C-right> :vertical resize +1<CR> 
 
 " no line numbers in Terminal
 au TermOpen * setlocal nonumber norelativenumber
-" 
+
 " insert mode in Terminal
 au BufEnter * if &buftype == 'terminal' | :startinsert! | endif
-
-" toggle terminal panel
-nnoremap <silent> <C-t> :call Term_toggle()<cr>
-tnoremap <silent> <C-t> <C-\><C-n><CR> :call Term_toggle()<cr>
-
-" exit insert mode
-tnoremap <silent> <ESC> <C-\><C-n><CR>
 
 let g:term_buf = 0
     function! Term_toggle()
