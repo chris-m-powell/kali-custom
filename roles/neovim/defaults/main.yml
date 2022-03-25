@@ -83,6 +83,7 @@ neovim:
         - 'splitbelow'
         - 'splitright'
         - 'autoread'
+        - 'cursorline'
     nnoremap:
       - '<silent> <leader>bj :bnext<CR>'
       - '<silent> <leader>bk :bprevious<CR>'

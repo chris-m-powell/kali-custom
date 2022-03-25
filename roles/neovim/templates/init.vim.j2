@@ -112,6 +112,9 @@ vnoremap {{ item }}
 colorscheme nord
 {% endif %}
 
+highlight clear CursorLine
+highlight CursorLineNR ctermfg=green
+
 " return to last edit position
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
