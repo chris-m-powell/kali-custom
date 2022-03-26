@@ -42,6 +42,7 @@
     - virtualbox
   post_tasks:
     - block:
+        - import_tasks: "{{ includes_dir + '/pulse_audio.yml' }}"
         - import_tasks: "{{ includes_dir + '/dist_upgrade.yml' }}"
       tags:
         - always

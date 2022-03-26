@@ -12,6 +12,7 @@
     update_cache: true
     state: latest
     pkg:
+      - fonts-jetbrains-mono
       - qutebrowser
 
 - name: Create necessary directories

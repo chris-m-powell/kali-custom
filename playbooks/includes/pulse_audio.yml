@@ -1,0 +1,5 @@
+- name: Tweak Pulse Audio server configuration
+  become_user: "{{ user }}"
+  command: pacmd set-source-volume 1 20000
+  changed_when: false
+  failed_when: false
