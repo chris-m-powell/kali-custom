@@ -27,7 +27,6 @@
           - libxkbcommon-dev
           - python3
           - gzip
-          - fonts-terminus
           - fonts-jetbrains-mono
         state: latest
         update_cache: true
