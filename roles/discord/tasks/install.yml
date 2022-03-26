@@ -46,3 +46,10 @@
         value: /usr/local/bin/Discord
   when:
     - not bin.stat.exists
+
+- name: install | enable autostart 
+  become_user: "{{ user }}"
+  copy:
+    src: /usr/share/applications/discord.desktop
+    dest: ~/.config/autostart
+    remote_src: true
