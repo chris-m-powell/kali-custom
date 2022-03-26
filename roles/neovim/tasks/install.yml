@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -11,7 +11,7 @@
       - neovim.plugins is defined
     quiet: true
 
-- name: install | apt install
+- name: Update APT cache & install packages
   apt:
     update_cache: true
     state: latest
@@ -19,10 +19,10 @@
       - python3-pip 
       - neovim 
 
-- name: install | deploy configuration
+- name: Deploy configuration
   become_user: "{{ user }}"
   block: 
-    - name: install | create necessary directories
+    - name: Create necessary directories
       file:
         path: "{{ item }}" 
         state: directory
@@ -30,7 +30,7 @@
         - "{{ neovim.config.dir }}"
         - "{{ neovim.vim_plug.dir }}"
 
-    - name: install | pip install flake8
+    - name: Install Flake8 Python linter via pip
       pip:
         name: flake8
         state: latest
@@ -39,7 +39,7 @@
         - neovim.vim_plug.enable
         - neovim.plugins.ale.enable
 
-    - name: install | deploy vim-plug 
+    - name: Install vim-plug
       uri:
         url: "{{ 'https://' + neovim.vim_plug.url }}"
         dest: "{{ neovim.vim_plug.dest }}"
@@ -49,7 +49,7 @@
       when:
         - neovim.vim_plug.enable
         
-    - name: install | deploy plug-ins updates
+    - name: Install plug-in updates
       git:
         repo: "{{ 'https://' + item.value.repo }}"
         dest: "{{ item.value.dest }}"
@@ -62,12 +62,12 @@
         - neovim.vim_plug.preinstall_plugins
       loop: "{{ neovim.plugins | dict2items }}"
 
-    - name: install | render config from template
+    - name: Render config from template
       template:
         src: init.vim.j2
         dest: "{{ neovim.config.dir + '/init.vim' }}"
 
-- name: install | remove Vim, Emacs, and Nano
+- name: Remove Vim, Emacs, and Nano
   apt:
     pkg:
       - vim 
@@ -85,7 +85,7 @@
     purge: true
     autoremove: true
 
-- name: install | remove leftover artifacts
+- name: Remove leftover artifacts
   file:
     path: "{{ item }}" 
     state: absent

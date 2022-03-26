@@ -1,25 +1,25 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
       - neofetch.config.dir is defined
     quiet: true
 
-- name: install | apt install
+- name: Update APT cache & install package 
   apt:
     update_cache: true
     state: latest
     pkg:
       - neofetch
 
-- name: install | create necessary directories
+- name: Create necessary directories
   become_user: "{{ user }}"
   file:
     path: "{{ neofetch.config.dir }}" 
     state: directory
 
-- name: install | render config from template
+- name: Render config from template
   become_user: "{{ user }}"
   template:
     src: "config.conf.j2"

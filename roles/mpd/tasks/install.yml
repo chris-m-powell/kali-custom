@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -21,17 +21,17 @@
       - mpd.config.attr.audio_output.fifo.format is defined
     quiet: true
 
-- name: install | apt install
+- name: Update APT cache & install package 
   apt:
     update_cache: true
     state: latest
     pkg:
       - mpd
 
-- name: install | apply local configurations
+- name: Deploy configurations
   become_user: "{{ user }}"
   block:
-    - name: install | create necessary directories
+    - name: Create necessary directories
       file:
         path: "{{ item }}" 
         state: directory
@@ -40,7 +40,7 @@
         - "{{ mpd.config.attr.playlist_directory }}"
         - "{{ mpd.config.attr.music_directory }}"
 
-    - name: install | create necessary files
+    - name: Create necessary files
       file:
         path: "{{ item }}" 
         state: touch
@@ -51,12 +51,12 @@
         - "{{ mpd.config.attr.pid_file }}"
         - "{{ mpd.config.attr.state_file }}"
 
-    - name: install | render config from template
+    - name: Render config from template
       template:
         src: "mpd.conf.j2"
         dest: "{{ mpd.config.dir + '/mpd.conf' }}"
 
-    - name: install | start and enable service with user scope
+    - name: Start & enable service with user scope
       systemd:
         name: mpd
         state: started

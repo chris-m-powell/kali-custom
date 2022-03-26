@@ -1,22 +1,22 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
       - user is defined
       - compton.config.dir is defined
 
-- name: install | apt install
+- name: Update APT cache & install package
   apt:
     update_cache: true
     state: latest
     pkg:
       - compton
 
-- name: install | deploy configurations
+- name: Deploy configurations
   become_user: "{{ user }}"
   block:
-    - name: install | create necessary directories
+    - name: Create necessary directories
       file:
         path: "{{ item }}" 
         state: directory
@@ -24,24 +24,24 @@
         - "{{ compton.config.dir }}"
         - ~/.config/autostart
 
-    - name: install | render configurations from template
+    - name: Render config from template
       template:
         src: "compton.conf.j2" 
         dest: "{{ compton.config.dir }}/compton.conf"
 
-    - name: install | enable autostart 
+    - name: Enable autostart 
       copy:
         src: compton.desktop
         dest: ~/.config/autostart
 
-    - name: install | xfce-specific tasks
+    - name: XFCE-specific tasks
       block:
-        - name: install | check xfwm default compositor
+        - name: Check if xfwm default compositor is enabled
           command: xfconf-query -c xfwm4 -p /general/use_compositing
           changed_when: false
           register: xfwm_default_compositor
 
-        - name: install | disable xfwm default compositor
+        - name: Disable xfwm default compositor
           command: xfconf-query -c xfwm4 -p /general/use_compositing -s false  
           when:
             - xfwm_default_compositor.stdout | bool 

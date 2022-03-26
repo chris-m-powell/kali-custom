@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -10,55 +10,56 @@
       - virtualbox.repo.debian_release
     quiet: true
 
-- name: install | apt install
+- name: Update APT cache & install facter 
   apt:
     update_cache: true
     state: present
     pkg:
       - facter 
 
-- name: install | detect if host is virtual or physical
+- name: Check if host is virtualized
   shell: facter 2> /dev/null | awk '$1~/is_virtual/ { print $3 }' 
+  changed_when: false
   register: is_virtual
 
-- name: install | report host status
+- name: Report host virtualization status
   debug:
     msg: This system is virtual, skipping VirtualBox installation... 
   when:
     - is_virtual.stdout | bool
 
-- name: install | initiate install procedure
+- name: Initiate install procedure
   block:
-    - name: install | check if repository keyring exists
+    - name: Check if repository keyring exists
       stat:
         path: "{{ virtualbox.repo.keyring }}"
       register: repo_keyring
 
-    - name: install | import repository key
+    - name: Import repository key
       block:
-        - name: install | download ASCII-armored OpenPGP repository key
+        - name: Download ASCII-armored OpenPGP repository key
           get_url:
             url: "{{ 'https://' + virtualbox.repo.key }}" 
             dest: /tmp
           register: repo_key
 
-        - name: install | unpack ASCII-armored OpenPGP repository key
+        - name: Unpack ASCII-armored OpenPGP repository key
           shell: cat "{{ repo_key.dest }}" | gpg --dearmor
           register: output
 
-        - name: install | import GPG key binary to keyring
+        - name: Import GPG key binary to keyring
           copy:
             content: "{{ output.stdout }}"
             dest: "{{ virtualbox.repo.keyring }}" 
 
-        - name: install | remove artifacts 
+        - name: Remove artifacts 
           file:
             path: "{{ repo_key.dest }}"
             state: absent
       when:
         - not repo_keyring.stat.exists
 
-    - name: install | add repository
+    - name: Add repository to APT source list
       copy:
         content: >
           deb
@@ -68,7 +69,7 @@
           contrib
         dest: /etc/apt/sources.list.d/virtualbox.list
 
-    - name: install | apt install
+    - name: Update APT cache & install packages 
       apt:
         update_cache: true
         state: latest

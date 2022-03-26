@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -13,20 +13,20 @@
       - ncmpcpp.config.bindings.scroll_down is defined
     quiet: true
 
-- name: install | apt install
+- name: Update APT cache & install package 
   apt:
     update_cache: true
     state: latest
     pkg:
       - ncmpcpp
 
-- name: install | create necessary directories
+- name: Create necessary directories
   become_user: "{{ user }}"
   file:
     path: "{{ ncmpcpp.config.dir }}" 
     state: directory
 
-- name: install | render config from template
+- name: Render config from template
   become_user: "{{ user }}"
   template:
     src: "{{ item + '.j2' }}"

@@ -1,11 +1,11 @@
 ---
-- name: install | install or update common utilities
+- name: Update APT cache & install packages 
   apt:
     update_cache: true
     pkg: "{{ misc_utils.pkg.apt }}"
     state: latest
 
-- name: install | pip install
+- name: Install Python packages via pip
   become_user: "{{ user }}"
   pip:
     name: "{{ misc_utils.pkg.pip }}" 

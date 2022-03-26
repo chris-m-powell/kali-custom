@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -9,14 +9,14 @@
       - alacritty.config.dir is defined 
     quiet: true
 
-- name: install | check install status
+- name: Check install status
   stat:
     path: /usr/local/bin/alacritty 
   register: bin
 
-- name: install | build from source
+- name: Build from source
   block: 
-    - name: install | apt install
+    - name: Install build dependencies 
       apt:
         pkg:
           - cmake 
@@ -31,13 +31,13 @@
         state: latest
         update_cache: true
 
-    - name: install | get user home directory
+    - name: Get user home directory
       become_user: "{{ user }}"
       shell: echo ${HOME}
       changed_when: false
       register: home
 
-    - name: install | download rust installer
+    - name: Download Rust installer
       become_user: "{{ user }}"
       get_url:
         url: https://sh.rustup.rs
@@ -46,18 +46,18 @@
         validate_certs: true
       register: rust_installer
 
-    - name: install | execute rust installer
+    - name: Execute Rust installer
       become_user: "{{ user }}"
       shell: "{{ '/bin/sh ' + rust_installer.dest + ' -y' }}"
       args:
         chdir: "{{ home.stdout }}"
 
-    - name: install | remove rust installer
+    - name: Remove Rust installer
       file:
         path: "{{ rust_installer.dest }}" 
         state: absent
 
-    - name: install | cargo install alacritty 
+    - name: Install via Cargo
       become_user: "{{ user }}"
       command: "{{ '~/.cargo/bin/' + item }}"
       loop:
@@ -65,14 +65,14 @@
         - rustup update stable
         - cargo install alacritty
 
-    - name: install | copy binary
+    - name: Copy binary
       copy:
         src: "{{ home.stdout + '/.cargo/bin/alacritty' }}"
         dest: /usr/local/bin 
         mode: 0755
         remote_src: true
     
-    - name: install | remove rust installation
+    - name: Remove Rust installation
       file:
         path: "{{ home.stdout + '/' + item }}" 
         state: absent
@@ -80,7 +80,7 @@
         - ".cargo"
         - ".rustup"
 
-    - name: install | remove rust env vars
+    - name: Remove Rust environment variables
       lineinfile:
         path: "{{ home.stdout + '/' + item }}"
         state: absent
@@ -89,7 +89,7 @@
         - ".zshenv"
         - ".bashrc"
 
-    - name: install | clone alacritty project repository
+    - name: Clone project repository
       become_user: "{{ user }}"
       git:
         repo: "{{ 'https://' + alacritty.project.repo }}"
@@ -98,24 +98,24 @@
         single_branch: true
       register: clone
 
-    - name: install | install alacritty icon
+    - name: Install icon
       copy:
         src: "{{ alacritty.project.dest + '/extra/logo/alacritty-term.svg' }}"
         dest: /usr/share/pixmaps/Alacritty.svg
         remote_src: true
 
-    - name: install | install desktop file 
+    - name: Install desktop file 
       command: "{{'desktop-file-install ' +  alacritty.project.dest + '/extra/linux/Alacritty.desktop' }}"
 
-    - name: install | update desktop database 
+    - name: Update desktop database 
       command: update-desktop-database 
 
-    - name: install | create man page directory
+    - name: Create man page directory
       file:
         path: /usr/local/share/man/man1
         state: directory
       
-    - name: install | create man pages
+    - name: Create man pages
       shell: "{{ item }}"
       args:
         chdir: "{{ alacritty.project.dest }}"
@@ -123,20 +123,20 @@
         - gzip -c extra/alacritty.man | tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
         - gzip -c extra/alacritty-msg.man | tee /usr/local/share/man/man1/alacritty-msg.1.gz > /dev/null
 
-    - name: install | remove local alacritty project repository
+    - name: Remove local project repository
       file:
         path: "{{ alacritty.project.dest }}" 
         state: absent
   when:
     - not bin.stat.exists
 
-- name: install | create local config directory
+- name: Create local config directory
   become_user: "{{ user }}"
   file:
     path: "{{ alacritty.config.dir }}"
     state: directory
 
-- name: install | render config from template
+- name: Render config from template
   become_user: "{{ user }}"
   template:
     src: "{{ item[0] }}"
@@ -145,17 +145,17 @@
     - ['alacritty.yml.j2','nord.yml.j2']
     - ['alacritty.yml','nord.yml']
 
-- name: install | set default terminal emulator
+- name: Set as default terminal emulator
   alternatives:
     name: x-terminal-emulator
     link: /usr/bin/x-terminal-emulator
     path: /usr/local/bin/alacritty
     priority: 50
 
-- name: install | xfce-specific configurations 
+- name: XFCE-specific configurations 
   become_user: "{{ user }}"
   block:
-    - name: install | create necessary directories
+    - name: Create necessary directories
       file:
         path: "{{ item }}" 
         state: directory
@@ -163,12 +163,12 @@
         - ~/.local/share/xfce4/helpers
         - ~/.config/xfce4
 
-    - name: install | create xfce desktop entry
+    - name: Create XFCE desktop entry
       copy:
         src: "custom-TerminalEmulator.desktop"
         dest: ~/.local/share/xfce4/helpers
 
-    - name: install | set xfce default terminal emulator 
+    - name: Set XFCE default terminal emulator 
       lineinfile:
         path: ~/.config/xfce4/helpers.rc
         line: TerminalEmulator=custom-TerminalEmulator

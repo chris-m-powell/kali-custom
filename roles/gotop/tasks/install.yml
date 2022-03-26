@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -7,14 +7,14 @@
       - gotop.dest is defined 
     quiet: true
 
-- name: install | check if installed
+- name: Check if installed
   stat:
     path: /usr/local/bin/gotop
   register: gotop_bin
 
-- name: install | build project from source
+- name: Build from source
   block:
-    - name: install | clone project 
+    - name: Clone project repository
       git:
         repo: "{{ 'https://' + gotop.repo }}"
         dest: "{{ gotop.dest }}" 
@@ -22,19 +22,19 @@
         single_branch: true
       register: clone
 
-    - name: install | build from source 
+    - name: Execute build script 
       command: ./scripts/download.sh
       args:
         chdir: "{{ gotop.dest }}"
 
-    - name: install | relocate binary
+    - name: Copy binary
       copy:
         src: "{{ gotop.dest + '/gotop' }}" 
         dest: /usr/local/bin
         remote_src: true
         mode: +x
 
-    - name: install | remove project
+    - name: Remove local project repository
       file:
         path: "{{ gotop.dest }}" 
         state: absent

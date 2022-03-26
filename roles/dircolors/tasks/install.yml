@@ -1,5 +1,5 @@
 ---
-- name: install | validate parameters
+- name: Validate parameters
   run_once: true
   assert:
     that:
@@ -8,7 +8,7 @@
       - dircolors.theme.nord.dest is defined
     quiet: true
     
-- name: install | clone project
+- name: Clone project repository
   become_user: "{{ user }}"
   git:
     repo: "{{ 'https://' + dircolors.theme.nord.repo }}"
@@ -18,20 +18,20 @@
     single_branch: true
   changed_when: false
 
-- name: install | copy source file to ~/.dir_colors
+- name: Copy source file to user home directory 
   become_user: "{{ user }}"
   copy:
     src: "{{ dircolors.theme.nord.dest + '/src/dir_colors' }}"
     dest: ~/.dir_colors
     remote_src: true
 
-- name: install | remove install artifacts
+- name: Remove install artifacts
   file:
     path: "{{ dircolors.theme.nord.dest }}" 
     state: absent
   changed_when: false
 
-- name: install | activate 
+- name: Activate 
   become_user: "{{ user }}"
   lineinfile:
     path: ~/.zshrc 
