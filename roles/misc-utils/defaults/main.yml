@@ -16,5 +16,6 @@ misc_utils:
       - hydra
       - dc3dd
       - bettercap
+      - gobuster
     pip:
       - impacket
