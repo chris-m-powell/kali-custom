@@ -17,5 +17,7 @@ misc_utils:
       - dc3dd
       - bettercap
       - gobuster
+      - nvidia-driver
+      - nvidia-cuda-toolkit
     pip:
       - impacket
