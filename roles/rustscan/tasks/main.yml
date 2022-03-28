@@ -1,0 +1,9 @@
+---
+- block:
+    - import_tasks: "install.yml"
+      tags:
+        - rustscan-install
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - rustscan

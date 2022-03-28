@@ -1,0 +1,12 @@
+---
+- block:
+    - import_tasks: "xfwm4.yml"
+      tags:
+        - xfce-xfwm4
+    - import_tasks: "shortcuts.yml"
+      tags:
+        - xfce-shortcuts
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - xfce

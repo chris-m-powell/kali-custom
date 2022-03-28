@@ -1,0 +1,53 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - ranger.config.dir is defined
+    quiet: true
+
+- name: configure | apply local user configurations 
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ ranger.config.dir }}" 
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: "{{ item }}" 
+        dest: "{{ ranger.config.dir }}" 
+      loop:
+        - commands.py 
+        - rc.conf
+        - rifle.conf
+        - scope.sh
+
+    - name: configure | set executable bit for auxiliary script 
+      file:
+        path: "{{ ranger.config.dir + '/scope.sh' }}"
+        mode: u+x
+
+    - name: configure | apply xfce-specific configurations
+      block:
+        - name: configure | create necessary directories
+          file:
+            path: "{{ item }}" 
+            state: directory
+          loop:
+            - ~/.local/share/xfce4/helpers
+            - ~/.config/xfce4
+
+        - name: configure | create xfce helper 
+          copy:
+            src: "custom-FileManager.desktop"
+            dest: ~/.local/share/xfce4/helpers
+
+        - name: configure | set xfce default file manager
+          lineinfile:
+            path: ~/.config/xfce4/helpers.rc
+            line: FileManager=custom-FileManager
+            create: true
+      when:
+        - '"xfce4" in ansible_facts.packages'

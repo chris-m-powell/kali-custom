@@ -1,64 +1,14 @@
 ---
-- name: Validate parameters
+- name: install | validate parameters
   run_once: true
   assert:
     that:
-      - mpd.config.dir is defined
-      - mpd.config.attr.bind_to_address is defined
-      - mpd.config.attr.music_directory is defined
-      - mpd.config.attr.playlist_directory is defined
-      - mpd.config.attr.db_file is defined
-      - mpd.config.attr.log_file is defined
-      - mpd.config.attr.pid_file is defined
-      - mpd.config.attr.state_file is defined
-      - mpd.config.attr.mixer_type is defined
-      - mpd.config.attr.audio_output.pulse.type is defined
-      - mpd.config.attr.audio_output.pulse.name is defined
-      - mpd.config.attr.audio_output.pulse.mixer_type is defined
-      - mpd.config.attr.audio_output.fifo.type is defined
-      - mpd.config.attr.audio_output.fifo.name is defined
-      - mpd.config.attr.audio_output.fifo.path is defined
-      - mpd.config.attr.audio_output.fifo.format is defined
     quiet: true
 
-- name: Update APT cache & install package 
+- name: install | install package updates
   apt:
-    update_cache: true
     state: latest
     pkg:
       - mpd
-
-- name: Deploy configurations
-  become_user: "{{ user }}"
-  block:
-    - name: Create necessary directories
-      file:
-        path: "{{ item }}" 
-        state: directory
-      loop:
-        - "{{ mpd.config.dir }}"
-        - "{{ mpd.config.attr.playlist_directory }}"
-        - "{{ mpd.config.attr.music_directory }}"
-
-    - name: Create necessary files
-      file:
-        path: "{{ item }}" 
-        state: touch
-      changed_when: false
-      loop:
-        - "{{ mpd.config.attr.db_file }}"
-        - "{{ mpd.config.attr.log_file }}"
-        - "{{ mpd.config.attr.pid_file }}"
-        - "{{ mpd.config.attr.state_file }}"
-
-    - name: Render config from template
-      template:
-        src: "mpd.conf.j2"
-        dest: "{{ mpd.config.dir + '/mpd.conf' }}"
-
-    - name: Start & enable service with user scope
-      systemd:
-        name: mpd
-        state: started
-        enabled: true
-        scope: user
+  notify:
+    - apt-get clean

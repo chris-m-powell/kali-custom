@@ -1,0 +1,53 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - alacritty.config.dir is defined 
+    quiet: true
+
+- name: configure | set as default terminal emulator
+  alternatives:
+    name: x-terminal-emulator
+    link: /usr/bin/x-terminal-emulator
+    path: /usr/local/bin/alacritty
+    priority: 50
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create local config directory
+      file:
+        path: "{{ alacritty.config.dir }}"
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: "{{ item }}" 
+        dest: "{{ alacritty.config.dir }}" 
+      loop:
+        - alacritty.yml
+        - nord.yml
+
+    - name: xfce-specific configurations 
+      block:
+        - name: configure | create necessary directories
+          file:
+            path: "{{ item }}" 
+            state: directory
+          loop:
+            - ~/.local/share/xfce4/helpers
+            - ~/.config/xfce4
+
+        - name: configure | create xfce helper
+          copy:
+            src: "custom-TerminalEmulator.desktop"
+            dest: ~/.local/share/xfce4/helpers
+
+        - name: configure | set xfce default terminal emulator 
+          lineinfile:
+            path: ~/.config/xfce4/helpers.rc
+            line: TerminalEmulator=custom-TerminalEmulator
+            create: true
+      when:
+        - '"xfce4" in ansible_facts.packages'

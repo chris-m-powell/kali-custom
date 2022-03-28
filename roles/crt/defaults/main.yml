@@ -1,0 +1,4 @@
+---
+crt:
+  config:
+    dir: "~/.config/cool-retro-term"

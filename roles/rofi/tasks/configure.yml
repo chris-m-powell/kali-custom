@@ -1,0 +1,33 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - rofi.config.dir is defined
+    quiet: true
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ rofi.config.dir }}" 
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: "{{ item }}" 
+        dest: "{{ rofi.config.dir }}" 
+      loop:
+        - config.rasi 
+        - nord.rasi 
+
+    - name: configure | apply xfce settings 
+      xfconf:
+        channel: xfce4-keyboard-shortcuts
+        property: /commands/custom/<Super>Return
+        value_type: string
+        value: rofi -show drun
+      when:
+        - '"xfce4" in ansible_facts.packages'
+    

@@ -30,26 +30,32 @@ END
 
 function display_help() {
   echo -e "\nUSAGE:\n"
-  echo -e "\tcurl -s https://raw.githubusercontent.com/chris-m-powell/kali-build/master/deploy.sh | sudo bash -s -- [<options>]"
+  echo -e "\tcurl -s https://raw.githubusercontent.com/chris-m-powell/kali-custom/master/deploy.sh | sudo bash -s -- [<options>]"
   echo -e "\nOPTIONS:\n"
-  echo -e "\t-u           \tName of local Kali user"
-  echo -e "\t-k           \tComma-delimited list of tags (defaults to 'all')"
-  echo -e "\t-h           \tDisplays usage options"
+  echo -e "\t-u               \tName of local Kali user"
+  echo -e "\t-k               \tComma-delimited list of tags (defaults to 'all')"
+  echo -e "\t-h               \tDisplays usage options"
   echo -e "\nSUPPORTED TAGS:\n"
-  echo -e "\tall          \tApply all custom configurations"
-  echo -e "\talacritty    \tFast, cross-platform, OpenGL terminal emulator"
-  echo -e "\tcompton      \tCompositor for X"
-  echo -e "\tdiscord      \tVoIP, instant messaging, and digital distribution platform"
-  echo -e "\tgotop        \tSystem activity monitoring tool"
-  echo -e "\tmpd          \tServer-side daemon for audio playback"
-  echo -e "\tmisc-tools   \tAssortment of misc packages available in Kali repo"
-  echo -e "\tneofetch     \tFast, highly customizable system info script"
-  echo -e "\tneovim       \tRefactor of Vim, focused on extensibility and usability"
-  echo -e "\tncmpcpp      \tTerminal-based MPD client to control audio playback"
-  echo -e "\tqutebrowser  \tKeyboard-driven, vim-like browser based on PyQt5"
-  echo -e "\tranger       \tTerminal-based, visual file manager inspired by Vim"
-  echo -e "\ttty-clock    \tSimple terminal clock"
-  echo -e "\tvirtualbox   \tx86 virtualization solution"
+  echo -e "\tall              \tApply all custom configurations"
+  echo -e "\talacritty        \tFast, cross-platform, OpenGL terminal emulator"
+  echo -e "\tbpytop           \tSystem activity monitoring tool"
+  echo -e "\tcava             \tTerminal-based audio visualizer "
+  echo -e "\tcrt              \tTerminal emulator mimicking old cathode display"
+  echo -e "\tdircolors        \tColor setup for ls"
+  echo -e "\tdiscord          \tVoIP, instant messaging, and digital distribution platform"
+  echo -e "\tlatex            \tHigh-quality typesetting system"
+  echo -e "\tlightdm          \tLightweight display manager"
+  echo -e "\tmpd              \tAudio playback daemon with client-server architecture"
+  echo -e "\tncmpcpp          \tNcurses client for MPD"
+  echo -e "\tneofetch         \tFast, highly customizable system info script"
+  echo -e "\tneovim           \tRefactor of Vim, focused on extensibility and usability"
+  echo -e "\tqutebrowser      \tKeyboard-driven, vim-like browser based on PyQt5"
+  echo -e "\tranger           \tTerminal-based, visual file manager inspired by Vim"
+  echo -e "\ttty-clock        \tSimple terminal clock"
+  echo -e "\tvirtualbox       \tx86 virtualization solution"
+  echo -e "\txfce             \tConfigure XFCE keyboard shortcuts and window manager settings"
+  echo -e "\tzathura          \tLightweight document viewer"
+  echo -e "\tzsh              \tModifications to zsh config"
   exit 1
 }
 
@@ -80,7 +86,7 @@ function detect_missing_deb_pkg() {
 }
 
 function detect_missing_pip_pkg() {
-  if [[ $(sudo -u "${KALI_USER}" python3 -m pip list --user | grep -c $1) -eq 0 ]]
+  if [[ $(sudo -u "${KALI_USER}" python3.9 -m pip list --user | grep -c $1) -eq 0 ]]
   then
     return 0
   else
@@ -131,7 +137,7 @@ function install_missing_pkgs() {
       cmd="apt install -y ${missing_deb_pkgs}"
       ;;
     pip)
-      cmd="sudo -u ${KALI_USER} python3 -m pip install ${missing_pip_pkgs} \
+      cmd="sudo -u ${KALI_USER} python3.9 -m pip install ${missing_pip_pkgs} \
         --user \
         --no-warn-script-location"
       ;;

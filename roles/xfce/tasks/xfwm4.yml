@@ -1,0 +1,16 @@
+---
+- name: xfwm4 | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - "{{ xfce.xfwm4 }} is defined"
+    quiet: true
+
+- name: xfwm4 | apply XFCE settings 
+  become_user: "{{ user }}"
+  xfconf:
+    channel: "xfwm4"
+    property: "{{ item.property }}" 
+    value_type: "{{ item.value_type }}" 
+    value: "{{ item.value }}" 
+  loop: "{{ xfce.xfwm4 }}"

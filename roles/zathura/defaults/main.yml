@@ -1,0 +1,4 @@
+---
+zathura:
+  config:
+    dir: "~/.config/zathura"

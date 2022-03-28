@@ -1,38 +1,23 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
-      - user is defined
-      - qutebrowser.config.dir is defined
     quiet: true
 
-- name: Update APT cache & install package
+- name: install | install package updates
   apt:
-    update_cache: true
+    state: latest
+    pkg:
+      - qutebrowser
+  notify:
+    - apt-get clean
+
+- name: install | update fonts
+  apt:
     state: latest
     pkg:
       - fonts-jetbrains-mono
-      - qutebrowser
-
-- name: Create necessary directories
-  become_user: "{{ user }}"
-  file:
-    path: "{{ qutebrowser.config.dir }}" 
-    state: directory
-
-- name: Render config from template
-  become_user: "{{ user }}"
-  template:
-    src: "{{ item[0] }}"
-    dest: "{{ qutebrowser.config.dir + '/' + item[1] }}"
-  with_together:
-    - ['config.py.j2','nord-qutebrowser.py.j2']
-    - ['config.py','nord-qutebrowser.py']
-
-- name: Set as default web browser 
-  alternatives:
-    name: x-www-browser 
-    link: /usr/bin/x-www-browser
-    path: /usr/bin/qutebrowser
-    priority: 50
+  notify:
+    - fc-cache
+    - apt-get clean

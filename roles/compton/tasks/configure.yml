@@ -1,0 +1,37 @@
+---
+- name: configure | validate parameters
+  run_once: true
+  assert:
+    that:
+      - compton.config.dir is defined
+    quiet: true
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ item }}" 
+        state: directory
+      loop:
+        - "{{ compton.config.dir }}"
+        - ~/.config/autostart/
+
+    - name: configure | enable autostart 
+      copy:
+        src: compton.desktop
+        dest: ~/.config/autostart
+
+    - name: configure | deploy config file
+      copy:
+        src: compton.conf
+        dest: "{{ compton.config.dir }}"
+
+    - name: configure | apply xfce settings 
+      xfconf:
+        channel: xfwm4
+        property: /general/use_compositing
+        value_type: bool
+        value: false 
+      when:
+        - '"xfce4" in ansible_facts.packages'

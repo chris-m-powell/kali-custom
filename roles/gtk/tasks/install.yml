@@ -1,0 +1,47 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - gtk.theme.repo is defined
+      - gtk.theme.name is defined
+      - gtk.wallpaper is defined
+    quiet: true
+
+- name: install | clone project repository
+  git:
+    repo: "{{ 'https://' + gtk.theme.repo }}"
+    dest: "{{ '/usr/share/themes/' + gtk.theme.name }}" 
+    depth: 1
+    single_branch: true
+
+- name: install | apply xfce settings 
+  become_user: "{{ user }}"
+  xfconf:
+    channel: "{{ item[0] }}"
+    property: "{{ item[1] }}" 
+    value_type: string
+    value: "{{ gtk.theme.name }}" 
+  with_together:
+    - ['xsettings','xfwm4']
+    - ['/Net/ThemeName','/general/theme']
+
+- name: install | create necessary directories
+  file:
+    path: /usr/share/backgrounds/nord 
+    state: directory
+  register: wallpaper
+
+- name: install | deploy wallpaper
+  copy:
+    src: "{{ gtk.wallpaper }}"
+    dest: "{{ wallpaper.path }}"
+
+- name: install | apply xfce settings 
+  become_user: "{{ user }}"
+  xfconf:
+    channel: "xfce4-desktop"
+    property: "/backdrop/screen0/monitorVirtual1/workspace0/last-image" 
+    value_type: string
+    value: "{{ wallpaper.path + '/' + gtk.wallpaper }}" 
+  ignore_errors: true

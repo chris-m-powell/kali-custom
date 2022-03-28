@@ -1,0 +1,23 @@
+---
+- name: configure | validate parameters
+  run_once: true
+  assert:
+    that:
+      - ncmpcpp.config.dir is defined
+    quiet: true
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | Create necessary directories
+      file:
+        path: "{{ ncmpcpp.config.dir }}" 
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: "{{ item }}" 
+        dest: "{{ ncmpcpp.config.dir }}" 
+      loop:
+        - config
+        - bindings

@@ -1,0 +1,13 @@
+---
+- name: configure | validate parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: configure | enable autostart 
+  become_user: "{{ user }}"
+  copy:
+    src: /usr/share/applications/discord.desktop
+    dest: ~/.config/autostart/
+    remote_src: true

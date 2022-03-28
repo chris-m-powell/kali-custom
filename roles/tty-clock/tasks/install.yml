@@ -1,5 +1,5 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
@@ -7,35 +7,42 @@
       - tty_clock.dest is defined 
     quiet: true
 
-- name: Check if installed
+- name: install | check if installed
   stat:
     path: /usr/local/bin/tty-clock
   register: tty_clock_bin
 
-- name: Build from source
+- name: install | build from source
   block:
-    - name: Clone project repository
+    - name: install | clone project repository
       git:
         repo: "{{ 'https://' + tty_clock.repo }}"
         dest: "{{ tty_clock.dest }}" 
         depth: 1
       register: clone
 
-    - name: Build from source 
+    - name: install | build from source 
       command: /usr/bin/make
       args:
         chdir: "{{ tty_clock.dest }}"
 
-    - name: Copy binary
+    - name: install | copy binary to /usr/local/bin
       copy:
         src: "{{ tty_clock.dest + '/tty-clock' }}" 
         dest: /usr/local/bin
         remote_src: true
         mode: +x
 
-    - name: Remove local project repository
+    - name: install | remove local project repository
       file:
         path: "{{ tty_clock.dest }}" 
         state: absent
   when:
     - not tty_clock_bin.stat.exists
+
+- name: install | create desktop file
+  copy:
+    src: tty_clock.desktop
+    dest: /usr/share/applications
+  notify:
+    - update-desktop-database 

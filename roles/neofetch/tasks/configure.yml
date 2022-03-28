@@ -1,0 +1,20 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - neofetch.config.dir is defined
+    quiet: true
+
+- name: configure | deploy configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ neofetch.config.dir }}" 
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: config.conf
+        dest: "{{ neofetch.config.dir }}"

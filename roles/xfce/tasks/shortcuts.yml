@@ -1,0 +1,32 @@
+---
+- name: shortcuts | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - "{{ xfce.shortcuts }} is defined"
+    quiet: true
+
+- name: shortcuts | remove all default keybindings
+  xml:
+    path: /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+    xpath: /channel[@name='xfce4-keyboard-shortcuts']/property[@name='{{ item }}']/property[@name='default']/*
+    state: absent
+  loop:
+    - commands
+    - xfwm4
+
+# - name: shortcuts | clean custom keybindings
+#   become_user: "{{ user }}"
+#   file:
+#     path: ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+#     state: absent
+
+- name: shortcuts | set custom keybindings 
+  become_user: "{{ user }}"
+  xfconf:
+    channel: "xfce4-keyboard-shortcuts"
+    property: "{{ item.property }}" 
+    value_type: string
+    value: "{{ item.value }}" 
+    state: "{{ item.state | default(omit) }}"
+  loop: "{{ xfce.shortcuts }}"

@@ -1,6 +1,11 @@
 ---
 - block:
     - import_tasks: "install.yml"
+      tags:
+        - mpd-install
+    - import_tasks: "configure.yml"
+      tags:
+        - mpd-configure
   rescue:
     - meta: flush_handlers
   tags:

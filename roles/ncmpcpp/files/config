@@ -1,0 +1,3 @@
+ncmpcpp_directory = "~/.config/ncmpcpp"
+mpd_music_dir = "~/Music"
+lyrics_directory = "~/.config/ncmpcpp/lyrics"

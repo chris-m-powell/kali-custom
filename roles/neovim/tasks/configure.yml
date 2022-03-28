@@ -1,0 +1,59 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - neovim.config.dir is defined
+      - neovim.vim_plug.dir is defined
+      - neovim.vim_plug.url is defined
+      - neovim.vim_plug.dest is defined
+      - neovim.plugins is defined
+    quiet: true
+
+- name: configure | deploy configuration
+  become_user: "{{ user }}"
+  block: 
+    - name: configure | create necessary directories
+      file:
+        path: "{{ item }}" 
+        state: directory
+      loop:
+        - "{{ neovim.config.dir }}"
+        - "{{ neovim.vim_plug.dir }}"
+
+    - name: configure | install Flake8 Python linter via pip
+      pip:
+        name: flake8
+        state: latest
+        extra_args: --user
+      when:
+        - neovim.vim_plug.enable
+        - neovim.plugins.ale.enable
+
+    - name: configure | install vim-plug
+      uri:
+        url: "{{ 'https://' + neovim.vim_plug.url }}"
+        dest: "{{ neovim.vim_plug.dest }}"
+        creates: "{{ neovim.vim_plug.dest }}"
+        return_content: true
+        validate_certs: true
+      when:
+        - neovim.vim_plug.enable
+        
+    - name: configure | install plug-in updates
+      git:
+        repo: "{{ 'https://' + item.value.repo }}"
+        dest: "{{ item.value.dest }}"
+        force: true
+        depth: 1
+        single_branch: true
+      when:
+        - item.value.enable
+        - neovim.vim_plug.enable
+        - neovim.vim_plug.preinstall_plugins
+      loop: "{{ neovim.plugins | dict2items }}"
+
+    - name: configure | render config from template
+      template:
+        src: init.vim.j2
+        dest: "{{ neovim.config.dir + '/init.vim' }}"

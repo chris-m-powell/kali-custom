@@ -1,14 +1,13 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
-      - user is defined
       - dircolors.theme.nord.repo is defined
       - dircolors.theme.nord.dest is defined
     quiet: true
     
-- name: Clone project repository
+- name: install | clone project repository
   become_user: "{{ user }}"
   git:
     repo: "{{ 'https://' + dircolors.theme.nord.repo }}"
@@ -18,23 +17,27 @@
     single_branch: true
   changed_when: false
 
-- name: Copy source file to user home directory 
-  become_user: "{{ user }}"
-  copy:
-    src: "{{ dircolors.theme.nord.dest + '/src/dir_colors' }}"
-    dest: ~/.dir_colors
-    remote_src: true
+- name: install | enable
+  block:
+    - name: install | copy source file to user home directory 
+      become_user: "{{ user }}"
+      copy:
+        src: "{{ dircolors.theme.nord.dest + '/src/dir_colors' }}"
+        dest: ~/.dir_colors
+        remote_src: true
 
-- name: Remove install artifacts
-  file:
-    path: "{{ dircolors.theme.nord.dest }}" 
-    state: absent
-  changed_when: false
+    - name: install | remove install artifacts
+      file:
+        path: "{{ dircolors.theme.nord.dest }}" 
+        state: absent
+      changed_when: false
 
-- name: Activate 
-  become_user: "{{ user }}"
-  lineinfile:
-    path: ~/.zshrc 
-    state: present
-    line: test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors) 
-    insertafter: EOF
+    - name: install | activate 
+      become_user: "{{ user }}"
+      lineinfile:
+        path: ~/.zshrc 
+        state: present
+        line: test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors) 
+        insertafter: EOF
+  when:
+    - not ansible_check_mode

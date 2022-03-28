@@ -4,6 +4,13 @@
   gather_facts: true
   become: true
   tasks:
+    - name: Validate parameters
+      run_once: true
+      assert:
+        that:
+          - user is defined
+        quiet: true
+
     - name: Group by distribution
       group_by:
         key: "{{ ansible_distribution }}"
@@ -15,34 +22,76 @@
   hosts: Kali
   become: true
   gather_facts: false
-  vars:
-    includes_dir: "{{ playbook_dir + '/includes' }}"
   handlers:
-    - import_tasks: "{{ includes_dir + '/handlers.yml' }}"
+    - import_tasks: "{{ playbook_dir + '/includes/handlers.yml' }}"
   pre_tasks:
     - block:
-        - import_tasks: "{{ includes_dir + '/package_facts.yml' }}"
-        - import_tasks: "{{ includes_dir + '/service_facts.yml' }}"
+        - name: Gather package facts 
+          package_facts:
+            manager: apt
+
+        - name: Gather service facts
+          service_facts:
+
+        - name: Update APT cache
+          apt:
+            update_cache: true
       tags:
         - always
   roles:
     - alacritty
+    - bpytop
+    - cava
     - compton
+    - crt
     - dircolors
     - discord
-    - gotop
-    - misc-utils
+    - latex
+    - lightdm
     - mpd
+    - ncmpcpp
     - neofetch
     - neovim
-    - ncmpcpp
     - qutebrowser
     - ranger
+    - rofi
+    - rustscan
     - tty-clock
     - virtualbox
-  post_tasks:
-    - block:
-        - import_tasks: "{{ includes_dir + '/pulse_audio.yml' }}"
-        - import_tasks: "{{ includes_dir + '/dist_upgrade.yml' }}"
+    - xfce
+    - zathura
+    - zsh
+  tasks:
+    - name: install misc tools
+      apt:
+        state: latest
+        pkg: 
+          - bettercap
+          - cmatrix
+          - dc3dd
+          - evil-winrm
+          - gdb
+          - gdb-doc
+          - gobuster
+          - hydra
+          - python3-impacket
+          - jq
+          - libsox-fmt-all
+          - lynis
+          - ncat
+          - ncdu
+          - nmap
+          - ndiff
+          - nuclei
+          - nvidia-cuda-toolkit
+          - nvidia-driver
+          - rkhunter
+          - seclists
+          - sox
+          - sqlmap
+          - strace
+          - tree
       tags:
-        - always
+        - misc-tools
+      notify:
+        - apt-get clean

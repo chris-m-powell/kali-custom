@@ -1,6 +1,11 @@
 ---
 - block:
     - import_tasks: "install.yml"
+      tags:
+        - neovim-install
+    - import_tasks: "configure.yml"
+      tags:
+        - neovim-configure
   rescue:
     - meta: flush_handlers
   tags:

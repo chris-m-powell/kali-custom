@@ -1,0 +1,21 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - cava.config.dir is defined
+    quiet: true
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ cava.config.dir }}" 
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: config
+        dest: "{{ cava.config.dir }}"
+        

@@ -1,0 +1,12 @@
+---
+- block:
+    - import_tasks: "ssh.yml"
+      tags:
+        - hardening-ssh
+    - import_tasks: "kernel.yml"
+      tags:
+        - hardening-kernel
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - hardening

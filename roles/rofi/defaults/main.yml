@@ -1,0 +1,4 @@
+---
+rofi:
+  config:
+    dir: "~/.config/rofi"

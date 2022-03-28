@@ -1,0 +1,12 @@
+---
+- block:
+    - import_tasks: "install.yml"
+      tags:
+        - bpytop-install
+    - import_tasks: "configure.yml"
+      tags:
+        - bpytop-configure
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - bpytop

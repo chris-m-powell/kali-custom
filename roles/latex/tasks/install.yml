@@ -1,0 +1,23 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: install | install package updates
+  apt:
+    state: latest
+    pkg:
+      - texlive-xetex
+  notify:
+    - apt-get clean
+
+- name: install | install font updates 
+  apt:
+    pkg:
+      - fonts-jetbrains-mono
+    state: latest
+  notify:
+    - fc-cache
+    - apt-get clean

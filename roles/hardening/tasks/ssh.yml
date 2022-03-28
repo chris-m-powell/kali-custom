@@ -1,0 +1,33 @@
+---
+- name: ssh | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - hardening.ssh is defined
+    quiet: true
+
+- name: ssh | harden sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^#*?\s*{{ item.key | regex_escape() }}\s+'
+    line: "{{ item.key }} {{ item.value }}"
+    owner: root
+    group: root
+    mode: 0644
+    validate: /usr/sbin/sshd -tf %s
+  when:
+    - item.value
+    - ansible_facts.services['ssh']['state'] == "running"
+  loop: "{{ hardening.ssh | dict2items }}"
+  notify: restart ssh
+
+- name: ssh | copy banner text
+  copy:
+    content: "{{ hardening.banner.text }}"
+    dest: "{{ hardening.sshd.Banner }}"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - hardening.ssh.Banner
+    - ansible_facts.services['ssh']['state'] == "running"

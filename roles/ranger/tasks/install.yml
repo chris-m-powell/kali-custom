@@ -1,14 +1,12 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
-      - ranger.config.dir is defined
     quiet: true
 
-- name: Update APT cache & install packages 
+- name: install | install package updates
   apt:
-    update_cache: true
     state: latest
     pkg:
       - ranger
@@ -18,52 +16,5 @@
       - w3m
       - poppler-utils
       - mediainfo
-
-- name: Create necessary directories
-  become_user: "{{ user }}"
-  file:
-    path: "{{ ranger.config.dir }}" 
-    state: directory
-
-- name: Render configuration files from template
-  become_user: "{{ user }}"
-  template:
-    src: "{{ item }}.j2"
-    dest: "{{ ranger.config.dir + '/' + item }}"
-  loop:
-    - commands.py 
-    - rc.conf
-    - rifle.conf
-    - scope.sh
-
-- name: Set executable bit for auxiliary script 
-  become_user: "{{ user }}"
-  file:
-    path: "{{ ranger.config.dir + '/scope.sh' }}"
-    mode: u+x
-
-- name: Apply XFCE-specific configurations
-  block:
-    - name: Create necessary directories
-      become_user: "{{ user }}"
-      file:
-        path: "{{ item }}" 
-        state: directory
-      loop:
-        - ~/.local/share/xfce4/helpers
-        - ~/.config/xfce4
-
-    - name: Create XFCE desktop entry 
-      become_user: "{{ user }}"
-      copy:
-        src: "custom-FileManager.desktop"
-        dest: ~/.local/share/xfce4/helpers
-
-    - name: Set XFCE default file manager
-      become_user: "{{ user }}"
-      lineinfile:
-        path: ~/.config/xfce4/helpers.rc
-        line: FileManager=custom-FileManager
-        create: true
-  when:
-    - '"kali-desktop-xfce" in ansible_facts.packages'
+  notify:
+    - apt-get clean

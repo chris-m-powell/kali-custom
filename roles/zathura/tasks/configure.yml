@@ -1,0 +1,30 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+      - zathura.config.dir is defined
+    quiet: true
+
+- name: configure | deploy configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: "{{ zathura.config.dir }}"
+        state: directory
+
+    - name: configure | deploy config file
+      copy:
+        src: zathurarc 
+        dest: "{{ zathura.config.dir }}" 
+
+    - name: configure | check default PDF viewer
+      shell: xdg-mime query default application/pdf
+      changed_when: false
+      register: default_pdf_viewer
+
+    - name: configure | set default PDF viewer
+      shell: xdg-mime default org.pwmt.zathura.desktop application/pdf
+      when:
+        - default_pdf_viewer.stdout != "org.pwmt.zathura.desktop"

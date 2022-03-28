@@ -1,0 +1,12 @@
+---
+- name: Configure lightdm greeter
+  ini_file:
+    path: /etc/lightdm/lightdm-gtk-greeter.conf
+    section: greeter
+    option: "{{ item.key }}" 
+    value: "{{ item.value }}" 
+  loop: "{{ lightdm | dict2items }}"
+  when:
+    - '"lightdm" in ansible_facts.packages'
+    - '"lightdm" in ansible_facts.services'
+    - 'ansible_facts.services.lightdm.state == "running"'

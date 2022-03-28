@@ -1,6 +1,0 @@
----
-- name: remove xfce desktop icons
-  become_user: "{{ user }}"
-  command: xfconf-query -c xfce4-desktop -v --create -p /desktop-icons/style -t int -s 0
-  when:
-    - '"kali-desktop-xfce" in ansible_facts.packages'

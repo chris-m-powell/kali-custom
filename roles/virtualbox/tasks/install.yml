@@ -1,5 +1,5 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
@@ -10,73 +10,63 @@
       - virtualbox.repo.debian_release
     quiet: true
 
-- name: Update APT cache & install facter 
-  apt:
-    update_cache: true
-    state: present
-    pkg:
-      - facter 
-
-- name: Check if host is virtualized
-  shell: facter 2> /dev/null | awk '$1~/is_virtual/ { print $3 }' 
-  changed_when: false
-  register: is_virtual
-
-- name: Report host virtualization status
+- name: install | report host virtualization status
   debug:
     msg: This system is virtual, skipping VirtualBox installation... 
   when:
-    - is_virtual.stdout | bool
+    - ansible_virtualization_role == "guest"
 
-- name: Initiate install procedure
+- name: install | initiate install procedure
   block:
-    - name: Check if repository keyring exists
+    - name: install | check if repository keyring exists
       stat:
         path: "{{ virtualbox.repo.keyring }}"
       register: repo_keyring
 
-    - name: Import repository key
+    - name: install | import repository key
       block:
-        - name: Download ASCII-armored OpenPGP repository key
+        - name: install | download ASCII-armored OpenPGP repository key
           get_url:
             url: "{{ 'https://' + virtualbox.repo.key }}" 
             dest: /tmp
           register: repo_key
 
-        - name: Unpack ASCII-armored OpenPGP repository key
+        - name: install | unpack ASCII-armored OpenPGP repository key
           shell: cat "{{ repo_key.dest }}" | gpg --dearmor
           register: output
 
-        - name: Import GPG key binary to keyring
+        - name: install | import GPG key binary to keyring
           copy:
             content: "{{ output.stdout }}"
             dest: "{{ virtualbox.repo.keyring }}" 
 
-        - name: Remove artifacts 
+        - name: install | remove artifacts 
           file:
             path: "{{ repo_key.dest }}"
             state: absent
       when:
         - not repo_keyring.stat.exists
 
-    - name: Add repository to APT source list
-      copy:
-        content: >
+    - name: install | add repository to APT source list
+      ansible.builtin.apt_repository:
+        repo: >
           deb
           [arch={{ virtualbox.repo.arch }} signed-by={{ virtualbox.repo.keyring }}]
           {{ virtualbox.repo.url }}
           {{ virtualbox.repo.debian_release }}
           contrib
-        dest: /etc/apt/sources.list.d/virtualbox.list
+        state: present
+        filename: virtualbox
 
-    - name: Update APT cache & install packages 
+    - name: install | install package updates
       apt:
-        update_cache: true
         state: latest
         pkg:
           - dkms 
           - virtualbox
       notify:
         - virtualbox-ext-pack
+        - apt-get clean
   when:
-    - not is_virtual.stdout | bool
+    - ansible_virtualization_role != "guest"
+

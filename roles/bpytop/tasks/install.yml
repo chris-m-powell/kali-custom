@@ -1,0 +1,22 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: install | install package updates
+  apt:
+    state: latest
+    pkg:
+      - bpytop
+  register: pkg_install
+  notify:
+    - apt-get clean
+
+- name: install | create desktop file
+  copy:
+    src: bpytop.desktop
+    dest: /usr/share/applications
+  notify:
+    - update-desktop-database 

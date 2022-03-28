@@ -1,0 +1,14 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: configure | append ~/.local/bin to PATH 
+  become_user: "{{ user }}"
+  lineinfile:
+    path: ~/.zshenv
+    state: present
+    line: "PATH=$PATH:$HOME/.local/bin"
+    insertafter: EOF

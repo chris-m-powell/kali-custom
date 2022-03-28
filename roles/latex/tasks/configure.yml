@@ -1,0 +1,23 @@
+---
+- name: configure | validate task list parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: configure | apply local user configurations
+  become_user: "{{ user }}"
+  block:
+    - name: configure | create necessary directories
+      file:
+        path: ~/htb 
+        state: directory
+
+    - name: configure | deploy HTB write-up template 
+      copy:
+        src: "{{ item }}" 
+        dest: ~/htb/ 
+      loop:
+        - htb_template.tex
+        - htb.sty
+        - htb.png

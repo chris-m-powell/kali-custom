@@ -1,55 +1,50 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
       - discord.pkg is defined 
     quiet: true
 
-- name: Check install status
+- name: install | check install status
   stat:
     path: /usr/local/bin/Discord 
   register: bin
 
-- name: Download and install
+- name: install | download and install
   block:
-    - name: Download tarball
+    - name: install | download tarball
       get_url:
         url: "{{ 'https://' + discord.pkg }}"
         dest: /tmp
       register: tarball
 
-    - name: Extract contents from tarball
+    - name: install | extract contents from tarball
       unarchive:
         src: "{{ tarball.dest }}"
         dest: /opt
 
-    - name: Remove tarball
+    - name: install | remove tarball
       file:
         path: "{{ tarball.dest }}"
         state: absent
 
-    - name: Link binary
+    - name: install | create binary symlink
       file:
         src: /opt/Discord/Discord
         dest: /usr/local/bin/Discord
         state: link
 
-    - name: Install desktop entry 
-      command: "{{'desktop-file-install ' +  '/opt/Discord/discord.desktop' }}"
+    - name: install | install desktop file 
+      command: "{{ 'desktop-file-install ' +  '/opt/Discord/discord.desktop' }}"
 
-    - name: Set executable path in desktop entry
+    - name: install | set executable path in desktop entry
       ini_file:
         path: /usr/share/applications/discord.desktop
         section: Desktop Entry
         option: Exec
         value: /usr/local/bin/Discord
+      notify:
+        - update-desktop-database 
   when:
     - not bin.stat.exists
-
-- name: Enable autostart 
-  become_user: "{{ user }}"
-  copy:
-    src: /usr/share/applications/discord.desktop
-    dest: ~/.config/autostart
-    remote_src: true

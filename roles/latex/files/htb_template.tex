@@ -1,0 +1,49 @@
+\documentclass[10pt,reqno]{article}
+\usepackage[margin=1.5in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}  
+\usepackage{mathrsfs} 
+\usepackage{mathtools}
+% \usepackage[T1]{fontenc} 
+\usepackage{verbatim}
+% \usepackage{fancyhdr}                   
+% \usepackage[colorlinks]{hyperref}
+% \usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{array} 
+\usepackage{url} 
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{fontspec}
+\setmonofont{JetBrains Mono}
+\usepackage{booktabs}
+\usepackage{htb}
+\usepackage{soul}
+
+\begin{document}
+\begin{titlepage}
+  \htb{<machine name>}{<IP address>}{<OS>}{<difficulty>}{<date>}{<points>}
+\end{titlepage}
+
+\tableofcontents
+\thispagestyle{empty}
+\pagebreak
+\setcounter{page}{1}
+
+\section{Reconnaissance}
+
+\subsection{Port Scan}
+
+\label{nmap-cmd}
+\begin{mybox}[listing options={language=bash,otherkeywords={nmap}}]{Nmap scan}
+\end{mybox}
+
+\subsection{Vulnerability Scan}
+
+\section{Exploitation}
+
+\section{Privilege Escalation}
+
+\end{document}

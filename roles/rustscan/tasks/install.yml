@@ -1,0 +1,88 @@
+---
+- name: install | validate task list parameters
+  run_once: true
+  assert:
+    that:
+    quiet: true
+
+- name: install | check install status
+  stat:
+    path: /usr/local/bin/rustscan 
+  register: bin
+
+- name: install | build from source
+  block: 
+    # - name: install | install build dependencies 
+    #   apt:
+    #     state: present
+    #     pkg:
+    #       - cmake 
+    #       - pkg-config
+    #       - libfreetype6-dev
+    #       - libfontconfig1-dev
+    #       - libxcb-xfixes0-dev
+    #       - libxkbcommon-dev
+    #       - python3
+    #       - gzip
+    #   notify:
+    #     - apt-get clean
+
+    - name: install | get user home directory
+      become_user: "{{ user }}"
+      shell: echo ${HOME}
+      changed_when: false
+      register: home
+
+    - name: install | download Rust installer
+      become_user: "{{ user }}"
+      get_url:
+        url: https://sh.rustup.rs
+        dest: "{{ home.stdout }}"
+        mode: 0700
+        validate_certs: true
+      register: rust_installer
+
+    - name: install | execute Rust installer
+      become_user: "{{ user }}"
+      shell: "{{ '/bin/sh ' + rust_installer.dest + ' -y' }}"
+      args:
+        chdir: "{{ home.stdout }}"
+
+    - name: install | remove Rust installer
+      file:
+        path: "{{ rust_installer.dest }}" 
+        state: absent
+
+    - name: install | install via Cargo
+      become_user: "{{ user }}"
+      command: "{{ '~/.cargo/bin/' + item }}"
+      loop:
+        - rustup override set stable
+        - rustup update stable
+        - cargo install rustscan 
+
+    - name: install | copy binary to /usr/local/bin
+      copy:
+        src: "{{ home.stdout + '/.cargo/bin/rustscan' }}"
+        dest: /usr/local/bin 
+        mode: 0755
+        remote_src: true
+
+    - name: install | remove Rust installation
+      file:
+        path: "{{ home.stdout + '/' + item }}" 
+        state: absent
+      loop:
+        - ".cargo"
+        - ".rustup"
+
+    - name: install | remove Rust environment variables
+      lineinfile:
+        path: "{{ home.stdout + '/' + item }}"
+        state: absent
+        line: . "$HOME/.cargo/env"
+      loop:
+        - ".zshenv"
+        - ".bashrc"
+  when:
+    - not bin.stat.exists

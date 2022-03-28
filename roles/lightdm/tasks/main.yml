@@ -1,0 +1,7 @@
+---
+- block:
+    - import_tasks: "greeter.yml"
+  rescue:
+    - meta: flush_handlers
+  tags:
+    - lightdm

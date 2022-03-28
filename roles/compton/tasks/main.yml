@@ -1,6 +1,11 @@
 ---
 - block:
     - import_tasks: "install.yml"
+      tags:
+        - compton-install
+    - import_tasks: "configure.yml"
+      tags:
+        - compton-configure
   rescue:
     - meta: flush_handlers
   tags:

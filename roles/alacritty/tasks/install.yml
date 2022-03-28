@@ -1,23 +1,22 @@
 ---
-- name: Validate parameters
+- name: install | validate task list parameters
   run_once: true
   assert:
     that:
-      - user is defined
       - alacritty.project.repo is defined 
       - alacritty.project.dest is defined 
-      - alacritty.config.dir is defined 
     quiet: true
 
-- name: Check install status
+- name: install | check install status
   stat:
     path: /usr/local/bin/alacritty 
   register: bin
 
-- name: Build from source
+- name: install | build from source
   block: 
-    - name: Install build dependencies 
+    - name: install | install build dependencies 
       apt:
+        state: present
         pkg:
           - cmake 
           - pkg-config
@@ -27,17 +26,16 @@
           - libxkbcommon-dev
           - python3
           - gzip
-          - fonts-jetbrains-mono
-        state: latest
-        update_cache: true
+      notify:
+        - apt-get clean
 
-    - name: Get user home directory
+    - name: install | get user home directory
       become_user: "{{ user }}"
       shell: echo ${HOME}
       changed_when: false
       register: home
 
-    - name: Download Rust installer
+    - name: install | download Rust installer
       become_user: "{{ user }}"
       get_url:
         url: https://sh.rustup.rs
@@ -46,18 +44,18 @@
         validate_certs: true
       register: rust_installer
 
-    - name: Execute Rust installer
+    - name: install | execute Rust installer
       become_user: "{{ user }}"
       shell: "{{ '/bin/sh ' + rust_installer.dest + ' -y' }}"
       args:
         chdir: "{{ home.stdout }}"
 
-    - name: Remove Rust installer
+    - name: install | remove Rust installer
       file:
         path: "{{ rust_installer.dest }}" 
         state: absent
 
-    - name: Install via Cargo
+    - name: install | install via Cargo
       become_user: "{{ user }}"
       command: "{{ '~/.cargo/bin/' + item }}"
       loop:
@@ -65,14 +63,14 @@
         - rustup update stable
         - cargo install alacritty
 
-    - name: Copy binary
+    - name: install | copy binary to /usr/local/bin
       copy:
         src: "{{ home.stdout + '/.cargo/bin/alacritty' }}"
         dest: /usr/local/bin 
         mode: 0755
         remote_src: true
-    
-    - name: Remove Rust installation
+
+    - name: install | remove Rust installation
       file:
         path: "{{ home.stdout + '/' + item }}" 
         state: absent
@@ -80,7 +78,7 @@
         - ".cargo"
         - ".rustup"
 
-    - name: Remove Rust environment variables
+    - name: install | remove Rust environment variables
       lineinfile:
         path: "{{ home.stdout + '/' + item }}"
         state: absent
@@ -89,7 +87,7 @@
         - ".zshenv"
         - ".bashrc"
 
-    - name: Clone project repository
+    - name: install | clone project repository
       become_user: "{{ user }}"
       git:
         repo: "{{ 'https://' + alacritty.project.repo }}"
@@ -98,24 +96,23 @@
         single_branch: true
       register: clone
 
-    - name: Install icon
+    - name: install | install icon
       copy:
         src: "{{ alacritty.project.dest + '/extra/logo/alacritty-term.svg' }}"
         dest: /usr/share/pixmaps/Alacritty.svg
         remote_src: true
 
-    - name: Install desktop file 
+    - name: install | install desktop file 
       command: "{{'desktop-file-install ' +  alacritty.project.dest + '/extra/linux/Alacritty.desktop' }}"
+      notify:
+        - update-desktop-database 
 
-    - name: Update desktop database 
-      command: update-desktop-database 
-
-    - name: Create man page directory
+    - name: install | ensure man page directory exists
       file:
         path: /usr/local/share/man/man1
         state: directory
       
-    - name: Create man pages
+    - name: install | create man pages
       shell: "{{ item }}"
       args:
         chdir: "{{ alacritty.project.dest }}"
@@ -123,55 +120,18 @@
         - gzip -c extra/alacritty.man | tee /usr/local/share/man/man1/alacritty.1.gz > /dev/null
         - gzip -c extra/alacritty-msg.man | tee /usr/local/share/man/man1/alacritty-msg.1.gz > /dev/null
 
-    - name: Remove local project repository
+    - name: install | remove build artifacts 
       file:
         path: "{{ alacritty.project.dest }}" 
         state: absent
   when:
     - not bin.stat.exists
 
-- name: Create local config directory
-  become_user: "{{ user }}"
-  file:
-    path: "{{ alacritty.config.dir }}"
-    state: directory
-
-- name: Render config from template
-  become_user: "{{ user }}"
-  template:
-    src: "{{ item[0] }}"
-    dest: "{{ alacritty.config.dir + '/' + item[1] }}"
-  with_together:
-    - ['alacritty.yml.j2','nord.yml.j2']
-    - ['alacritty.yml','nord.yml']
-
-- name: Set as default terminal emulator
-  alternatives:
-    name: x-terminal-emulator
-    link: /usr/bin/x-terminal-emulator
-    path: /usr/local/bin/alacritty
-    priority: 50
-
-- name: XFCE-specific configurations 
-  become_user: "{{ user }}"
-  block:
-    - name: Create necessary directories
-      file:
-        path: "{{ item }}" 
-        state: directory
-      loop:
-        - ~/.local/share/xfce4/helpers
-        - ~/.config/xfce4
-
-    - name: Create XFCE desktop entry
-      copy:
-        src: "custom-TerminalEmulator.desktop"
-        dest: ~/.local/share/xfce4/helpers
-
-    - name: Set XFCE default terminal emulator 
-      lineinfile:
-        path: ~/.config/xfce4/helpers.rc
-        line: TerminalEmulator=custom-TerminalEmulator
-        create: true
-  when:
-    - '"kali-desktop-xfce" in ansible_facts.packages'
+- name: install | install font updates 
+  apt:
+    pkg:
+      - fonts-jetbrains-mono
+    state: latest
+  notify:
+    - fc-cache
+    - apt-get clean

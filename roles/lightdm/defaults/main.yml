@@ -1,0 +1,7 @@
+---
+lightdm:
+  background: "/usr/share/backgrounds/kali-16x9/kali-small-logo2.png"
+  theme-name: "Kali-Dark"
+  indicators: "~session;~spacer;~clock;~spacer;~power"
+  hide-user-image: "false"
+  clock-format: "%d %b, %H:%M"

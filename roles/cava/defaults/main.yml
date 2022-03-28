@@ -1,0 +1,4 @@
+---
+cava:
+  config:
+    dir: "~/.config/cava"
