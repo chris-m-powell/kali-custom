@@ -66,9 +66,11 @@
       apt:
         state: latest
         pkg: 
+          - antiword
           - bettercap
           - cmatrix
           - dc3dd
+          - docx2txt
           - evil-winrm
           - gdb
           - gdb-doc
