@@ -10,6 +10,7 @@
     state: latest
     pkg:
       - texlive-xetex
+      - texlive-fonts-extra
   notify:
     - apt-get clean
 

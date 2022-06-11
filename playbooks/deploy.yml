@@ -85,8 +85,8 @@
           - nmap
           - ndiff
           - nuclei
-          - nvidia-cuda-toolkit
-          - nvidia-driver
+          # - nvidia-cuda-toolkit
+          # - nvidia-driver
           - rkhunter
           - seclists
           - sox
