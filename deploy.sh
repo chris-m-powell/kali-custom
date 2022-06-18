@@ -51,6 +51,7 @@ function display_help() {
   echo -e "\tneovim           \tRefactor of Vim, focused on extensibility and usability"
   echo -e "\tqutebrowser      \tKeyboard-driven, vim-like browser based on PyQt5"
   echo -e "\tranger           \tTerminal-based, visual file manager inspired by Vim"
+  echo -e "\trustcan          \tThe modern-day port scanner"
   echo -e "\ttty-clock        \tSimple terminal clock"
   echo -e "\tvirtualbox       \tx86 virtualization solution"
   echo -e "\txfce             \tConfigure XFCE keyboard shortcuts and window manager settings"
