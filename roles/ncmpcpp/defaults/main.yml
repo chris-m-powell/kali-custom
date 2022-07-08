@@ -1,4 +1,0 @@
----
-ncmpcpp:
-  config:
-    dir: "~/.config/ncmpcpp"

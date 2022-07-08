@@ -1,6 +1,0 @@
----
-gtk:
-  wallpaper: "nord.jpg"
-  theme:
-    name: "Nordic"
-    repo: "github.com/EliverLara/Nordic.git"

@@ -41,22 +41,17 @@
   roles:
     - alacritty
     - bpytop
-    - cava
     - compton
     - crt
     - dircolors
     - discord
-    - latex
     - lightdm
-    - mpd
-    - ncmpcpp
     - neofetch
     - neovim
     - qutebrowser
     - ranger
     - rofi
     - rustscan
-    - tty-clock
     - virtualbox
     - xfce
     - zathura
@@ -92,6 +87,8 @@
           - sox
           - sqlmap
           - strace
+          - texlive-xetex
+          - texlive-fonts-extra
           - tree
       tags:
         - misc-tools

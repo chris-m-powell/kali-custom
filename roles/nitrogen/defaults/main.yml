@@ -1,5 +1,0 @@
----
-nitrogen:
-  user: "{{ user }}"
-  config:
-    dir: "~/.config/nitrogen"

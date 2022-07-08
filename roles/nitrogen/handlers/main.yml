@@ -1,4 +1,0 @@
-- name: set wallpaper 
-  become_user: "{{ nitrogen.user }}"
-  command: nitrogen --restore
-  listen: nitrogen --restore

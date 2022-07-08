@@ -1,5 +1,0 @@
-[Desktop Entry]
-Icon=htop
-Name=cava
-Type=Application
-Exec=/usr/local/bin/alacritty -e "cava"

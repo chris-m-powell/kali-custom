@@ -1,6 +1,0 @@
----
-- name: suid | Get list of SUID binaries 
-  shell: df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -4000 2> /dev/null
-  register: suid_bin_list 
-
-- debug: var={{ suid_bin_list.stdout }}
